@@ -1,3 +1,21 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /firstSpring
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: 314159
+    key-store-type: PKCS12
+    key-alias: tomcat
+
 spring:
-  application:
-    name: firstSpringProject
+  datasource:
+    url: jdbc:postgresql://localhost:5432/childdb
+    username: myuser
+    password: secret
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

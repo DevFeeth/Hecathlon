@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription</title>
+</head>
+<body>
+    <h2>User Inscription</h2>
+
+    <form th:action="@{/inscription/send}" th:object="${currentUser}" method="post">
+
+        <div>
+            <label for="username">Name :</label>
+            <input type="text" id="username" th:field="*{username}" placeholder="Enter your username" />
+            <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color: red;"></span>
+        </div>
+        <br/>
+
+        <div>
+            <label for="age">Age :</label>
+            <input type="number" id="age" th:field="*{age}" placeholder="Enter your age" />
+            <span th:if="${#fields.hasErrors('age')}" th:errors="*{age}" style="color: red;"></span>
+        </div>
+        <br/>
+
+        <div>
+            <span>
+                <input type="radio" id="male" th:field="*{male}" th:value="true" />
+                <label for="male">Boy</label>
+            </span>
+            <span>
+                <input type="radio" id="female" th:field="*{male}" th:value="false" />
+                <label for="female">Girl</label>
+            </span>
+        </div>
+        <br/>
+
+        <div>
+            <label for="hobby">What's your preferred hobby ?</label>
+            <select id="hobby" th:field="*{hobby}">
+                <option th:each="hobby : ${hobbies}"
+                        th:value="${hobby.id}"
+                        th:text="${hobby.name}">
+                </option>
+            </select>
+        </div>
+        </br>
+
+        <button type="submit">Submit</button>
+
+    </form>
+</body>
+</html>

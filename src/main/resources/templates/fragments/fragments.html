@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+</html>
+    <div th:fragment="header">
+        <h1> <img th:src="@{/images/banner.png}" alt="Logo" height="32"/> Welcome to my Website</h1>
+        <div>
+            <a th:href="@{''(lang='fr')}">
+                <img th:src="@{/images/flags/fr.svg}" alt="French Flag" style="width: 30px; height: 20px;">
+            </a>
+            <a th:href="@{''(lang='en')}">
+                <img th:src="@{/images/flags/uk.svg}" alt="English Flag" style="width: 30px; height: 20px;">
+            </a>
+        </div>
+    </div>
+
+    <div th:fragment="footer">
+        <p>© 2026 My Company. All rights reserved.</p>
+    </div>
+</html>
