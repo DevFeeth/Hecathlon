@@ -1,14 +1,36 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title></title>
 </head>
 <body>
-    <form th:action="@{/login}" method="post">
-        <label>Username :<input type="text" name="username"/></label><br/>
-        <label>Password :<input type="password" name="password"/></label><br/>
-        <button type="submit">Connexion</button>
+<main layout:fragment="main-content" class="container auth">
+    <h1 th:text="#{login.title}">Connexion</h1>
+
+    <p class="alert alert-success" th:if="${param.registered != null}" th:text="#{login.registered}">Compte créé.</p>
+    <p class="alert alert-error" th:if="${param.error != null}" th:text="#{login.error}">Identifiants incorrects.</p>
+
+    <form class="form" th:action="@{/login}" method="post">
+        <label>
+            <span th:text="#{user.username}">Nom d'utilisateur</span>
+            <input type="text" name="username" autocomplete="username" required autofocus>
+        </label>
+        <label>
+            <span th:text="#{user.password}">Mot de passe</span>
+            <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn btn-primary" type="submit" th:text="#{login.submit}">Se connecter</button>
     </form>
+
+    <p class="auth-switch">
+        <span th:text="#{login.noAccount}">Pas encore de compte ?</span>
+        <a class="link" th:href="@{/inscription}" th:text="#{inscription.title}">Créer un compte</a>
+    </p>
+</main>
 </body>
 </html>

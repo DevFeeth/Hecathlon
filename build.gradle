@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.spring.henallux'
 version = '0.0.1-SNAPSHOT'
-description = 'firstSpringProject'
+description = 'Hecathlon - site e-commerce de sport'
 
 java {
     toolchain {
