@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <section class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{nav.allSports}">Tous les sports</span>
+        </nav>
+        <p class="kicker accent" th:text="#{sports.kicker}">Votre prochaine passion commence ici</p>
+        <h1 th:text="#{sports.title}">Tous les sports. Toutes les envies.</h1>
+        <div class="page-head-sub">
+            <p th:text="#{sports.text}">Tout l'équipement pour bouger à votre façon.</p>
+            <small th:text="#{sports.count(${#lists.size(sports)})}">3 sports à explorer</small>
+        </div>
+    </section>
+
+    <section class="container section">
+        <div class="grid grid-3">
+            <a class="sport-card" href="#" th:each="sport : ${sports}">
+                <div th:replace="~{fragments/fragments.html :: media(${sport.image}, ${sport.id})}"></div>
+                <div class="sport-card-title">
+                    <h2 th:text="#{${'sport.' + sport.id}}">Sport</h2>
+                    <span aria-hidden="true">→</span>
+                </div>
+                <small th:text="#{${'sport.' + sport.id + '.categories'}}">Catégories</small>
+                <small class="count" th:text="#{sports.articles(${articleCounts[sport.id] ?: 0})}">0 article</small>
+            </a>
+        </div>
+    </section>
+
+    <section class="container section">
+        <div class="split-banner">
+            <div th:replace="~{fragments/fragments.html :: media('/images/sports/running-banner.jpg', 'running')}"></div>
+            <div class="split-banner-text">
+                <p class="kicker accent" th:text="#{sports.banner.kicker}">On est là pour vous</p>
+                <h2 th:text="#{sports.banner.title}">Un nouveau sport ? Le bon départ.</h2>
+                <p th:text="#{sports.banner.text}">Découvrez nos guides débutants.</p>
+                <a class="btn btn-primary" href="#" th:text="#{sports.banner.cta}">Trouver mon équipement</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

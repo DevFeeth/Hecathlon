@@ -5,31 +5,30 @@
 <body>
 
 <header th:fragment="header" class="site-header">
-    <div class="topbar" th:text="#{topbar.message}">Livraison offerte</div>
 
     <div class="container header-main">
         <a class="logo" th:href="@{/}">HECATHLON</a>
 
         <!-- shortcut: search is not wired yet, it reloads the home page -->
         <form class="search" role="search" th:action="@{/}" method="get">
-            <span aria-hidden="true">🔍</span>
+            <svg th:replace="~{fragments/icons.html :: search}"></svg>
             <input type="search" name="q" th:placeholder="#{header.search}" th:attr="aria-label=#{header.search}">
         </form>
 
         <div class="header-actions">
-            <a href="#"><span aria-hidden="true">📍</span><span th:text="#{header.store}">Mon magasin</span></a>
+            <a href="#"><svg th:replace="~{fragments/icons.html :: pin}"></svg><span th:text="#{header.store}">Mon magasin</span></a>
 
             <a sec:authorize="!isAuthenticated()" th:href="@{/login}">
-                <span aria-hidden="true">👤</span><span th:text="#{header.account}">Mon compte</span>
+                <svg th:replace="~{fragments/icons.html :: user}"></svg><span th:text="#{header.account}">Mon compte</span>
             </a>
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
                 <button type="submit">
-                    <span aria-hidden="true">👤</span>
+                    <svg th:replace="~{fragments/icons.html :: user}"></svg>
                     <span><strong sec:authentication="principal.username">user</strong> · <span th:text="#{header.logout}">Déconnexion</span></span>
                 </button>
             </form>
 
-            <a href="#"><span aria-hidden="true">🛒</span><span th:text="#{header.cart(0)}">Panier (0)</span></a>
+            <a href="#"><svg th:replace="~{fragments/icons.html :: bag}"></svg><span th:text="#{header.cart(0)}">Panier (0)</span></a>
 
             <div class="lang">
                 <a th:href="@{''(lang='fr')}"><img th:src="@{/images/flags/fr.svg}" alt="Français"></a>
@@ -40,7 +39,7 @@
 
     <nav class="main-nav">
         <div class="container">
-            <a href="#" th:text="#{nav.allSports}">Tous les sports</a>
+            <a th:href="@{/sports}" th:text="#{nav.allSports}">Tous les sports</a>
             <a href="#" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
             <a href="#" class="promo" th:text="#{nav.promotions}">Promotions</a>
         </div>

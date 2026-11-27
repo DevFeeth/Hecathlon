@@ -14,6 +14,7 @@
     <!-- Hero -->
     <section class="container hero">
         <div class="hero-main ph-running">
+            <img th:src="@{/images/sports/running.jpg}" alt="">
             <div class="hero-content">
                 <p class="kicker" th:text="#{hero.kicker}">Collection course à pied</p>
                 <h1>
@@ -40,11 +41,12 @@
 
     <!-- Reassurance -->
     <section class="container reassurance">
-        <div th:each="item : ${ {'pickup', 'delivery', 'returns', 'workshop'} }">
-            <span class="icon" aria-hidden="true" th:text="#{${'reassurance.' + item + '.icon'}}">✓</span>
+        <div th:each="item : ${ {pickup: 'store', delivery: 'truck', returns: 'rotate', workshop: 'wrench'} }"
+             th:with="key=${item.key}">
+            <svg th:replace="~{fragments/icons.html :: __${item.value}__}"></svg>
             <div>
-                <strong th:text="#{${'reassurance.' + item + '.title'}}">Titre</strong>
-                <small th:text="#{${'reassurance.' + item + '.text'}}">Texte</small>
+                <strong th:text="#{${'reassurance.' + key + '.title'}}">Titre</strong>
+                <small th:text="#{${'reassurance.' + key + '.text'}}">Texte</small>
             </div>
         </div>
     </section>
@@ -53,7 +55,7 @@
     <section class="container section">
         <div class="section-head">
             <h2 th:text="#{home.sports.title}">À chaque passion, son terrain.</h2>
-            <a class="link" href="#" th:text="#{nav.allSports} + ' →'">Tous les sports →</a>
+            <a class="link" th:href="@{/sports}" th:text="#{nav.allSports} + ' →'">Tous les sports →</a>
         </div>
         <div class="grid grid-3">
             <a class="sport-card" href="#" th:each="sport : ${sports}">
