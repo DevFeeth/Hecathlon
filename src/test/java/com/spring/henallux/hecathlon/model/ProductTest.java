@@ -3,14 +3,15 @@ package com.spring.henallux.hecathlon.model;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProductTest {
 
     private static Product product(String price, String oldPrice) {
-        return new Product("id", "name", "brand", "running", "shoes", "", 0, 0,
-                new BigDecimal(price), oldPrice == null ? null : new BigDecimal(oldPrice), false, null);
+        return new Product("id", "name", "brand", "running", "shoes", "", "", 0, 0,
+                new BigDecimal(price), oldPrice == null ? null : new BigDecimal(oldPrice), false, null, List.of());
     }
 
     @Test

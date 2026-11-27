@@ -27,7 +27,7 @@
         </div>
 
         <div class="hero-side">
-            <a class="hero-card" href="#" th:each="p : ${highlightedProducts}">
+            <a class="hero-card" th:href="@{/produits/{id}(id=${p.id})}" th:each="p : ${highlightedProducts}">
                 <div>
                     <p class="kicker" th:text="${p.brand}">Marque</p>
                     <p class="hero-card-title" th:text="${p.name}">Produit</p>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{breadcrumb.cart}">Mon panier</span>
+        </nav>
+
+        <ol class="steps">
+            <li class="active"><span>1</span> <th:block th:text="#{cart.steps.cart}">Panier</th:block></li>
+            <li><span>2</span> <th:block th:text="#{cart.steps.delivery}">Livraison</th:block></li>
+            <li><span>3</span> <th:block th:text="#{cart.steps.payment}">Paiement</th:block></li>
+            <li><span>4</span> <th:block th:text="#{cart.steps.confirmation}">Confirmation</th:block></li>
+        </ol>
+
+        <div class="section-head">
+            <h1 th:text="#{cart.title(${cart.itemCount})}">Mon panier · 3 articles</h1>
+            <a class="link" th:href="@{/sports}" th:text="'← ' + #{cart.continue}">← Continuer mes achats</a>
+        </div>
+    </div>
+
+    <section class="container cart-empty" th:if="${cart.empty}">
+        <p th:text="#{cart.empty}">Votre panier est vide.</p>
+        <a class="btn btn-primary" th:href="@{/sports}" th:text="#{cart.emptyCta}">Découvrir nos sports</a>
+    </section>
+
+    <section class="container cart" th:unless="${cart.empty}">
+        <div class="cart-lines">
+            <p class="alert alert-success cart-delivery">
+                <svg th:replace="~{fragments/icons.html :: truck}"></svg>
+                <span th:if="${cart.deliveryCost.signum() == 0}" th:text="#{cart.freeDelivery}">La livraison est offerte !</span>
+                <span th:unless="${cart.deliveryCost.signum() == 0}"
+                      th:text="#{cart.deliveryMissing(${#numbers.formatDecimal(cart.missingForFreeDelivery, 1, 2, 'COMMA')})}">
+                    Plus que 10,00 € pour la livraison offerte.</span>
+            </p>
+
+            <article class="cart-line" th:each="line : ${cart.lines}" th:with="p=${line.product}">
+                <a th:href="@{/produits/{id}(id=${p.id})}">
+                    <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
+                </a>
+                <div class="cart-line-info">
+                    <p class="kicker muted" th:text="${p.brand}">Marque</p>
+                    <h2><a th:href="@{/produits/{id}(id=${p.id})}" th:text="${p.name}">Produit</a></h2>
+                    <small class="muted" th:if="${line.size != null}" th:text="#{cart.size(${line.size})}">Taille 42</small>
+                    <small class="stock" th:text="#{product.inStock}">En stock</small>
+                    <div class="cart-line-actions">
+                        <form class="qty" th:action="@{/panier/quantite}" method="post">
+                            <input type="hidden" name="key" th:value="${line.key}">
+                            <button type="submit" name="quantity" th:value="${line.quantity - 1}"
+                                    th:attr="aria-label=#{cart.decrease}">−</button>
+                            <span th:text="${line.quantity}" th:attr="aria-label=#{cart.quantity}">1</span>
+                            <button type="submit" name="quantity" th:value="${line.quantity + 1}"
+                                    th:disabled="${line.atMaxQuantity}"
+                                    th:attr="aria-label=#{cart.increase}">+</button>
+                        </form>
+                        <form th:action="@{/panier/supprimer}" method="post">
+                            <input type="hidden" name="key" th:value="${line.key}">
+                            <button class="link-button" type="submit" th:text="#{cart.remove}">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+                <p class="cart-line-total" th:text="${#numbers.formatDecimal(line.total, 1, 2, 'COMMA')} + ' €'">89,99 €</p>
+            </article>
+        </div>
+
+        <aside class="cart-summary">
+            <div class="summary-box">
+                <h2 th:text="#{cart.summary}">Votre commande</h2>
+                <small class="muted" th:text="#{cart.summaryInfo}">Vendu et expédié par Hecathlon</small>
+                <dl>
+                    <dt th:text="#{cart.subtotal(${cart.itemCount})}">Sous-total</dt>
+                    <dd th:text="${#numbers.formatDecimal(cart.subtotal, 1, 2, 'COMMA')} + ' €'">0,00 €</dd>
+                    <dt th:text="#{cart.delivery}">Livraison à domicile</dt>
+                    <dd th:if="${cart.deliveryCost.signum() == 0}" class="free" th:text="#{cart.deliveryFree}">Offerte</dd>
+                    <dd th:unless="${cart.deliveryCost.signum() == 0}" th:text="${#numbers.formatDecimal(cart.deliveryCost, 1, 2, 'COMMA')} + ' €'">4,99 €</dd>
+                </dl>
+                <div class="summary-total">
+                    <span th:text="#{cart.total}">Total TTC</span>
+                    <strong th:text="${#numbers.formatDecimal(cart.total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+                </div>
+                <small class="muted">
+                    <th:block th:text="#{cart.vat(${#numbers.formatDecimal(cart.vat, 1, 2, 'COMMA')})}">Dont 0,00 € de TVA</th:block>
+                    <th:block th:if="${cart.savings.signum() > 0}"
+                              th:text="' · ' + #{cart.savings(${#numbers.formatDecimal(cart.savings, 1, 2, 'COMMA')})}"> · Vous économisez</th:block>
+                </small>
+                <!-- shortcut: checkout (delivery, payment, order) does not exist yet; link this button to it when it does -->
+                <button class="btn btn-primary btn-block" type="button" th:text="#{cart.checkout} + ' →'">Passer ma commande →</button>
+                <small class="muted" th:text="#{cart.secure}">Paiement sécurisé</small>
+            </div>
+            <div class="summary-box summary-payment">
+                <h3 th:text="#{cart.payment}">Payez comme vous aimez</h3>
+                <p class="payment-brands">VISA · Mastercard · PayPal</p>
+            </div>
+        </aside>
+    </section>
+
+    <section class="container section" th:unless="${suggestions.empty}">
+        <div class="section-head">
+            <h2 th:text="#{cart.suggestions}">Pour votre prochaine sortie</h2>
+        </div>
+        <div class="grid grid-4">
+            <th:block th:each="s : ${suggestions}"><a th:replace="~{fragments/fragments.html :: productCard(${s})}"></a></th:block>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

@@ -28,7 +28,7 @@
                 </button>
             </form>
 
-            <a href="#"><svg th:replace="~{fragments/icons.html :: bag}"></svg><span th:text="#{header.cart(0)}">Panier (0)</span></a>
+            <a th:href="@{/panier}"><svg th:replace="~{fragments/icons.html :: bag}"></svg><span th:text="#{header.cart(${session.cart != null ? session.cart.itemCount : 0})}">Panier (0)</span></a>
 
             <div class="lang">
                 <a th:href="@{''(lang='fr')}"><img th:src="@{/images/flags/fr.svg}" alt="Français"></a>
@@ -59,7 +59,7 @@
 </p>
 
 <!-- Product card used in every product grid -->
-<a th:fragment="productCard(p)" class="product-card" href="#">
+<a th:fragment="productCard(p)" class="product-card" th:href="@{/produits/{id}(id=${p.id})}">
         <div class="product-media">
             <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
             <span class="badge sale" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + ' %'">-10 %</span>

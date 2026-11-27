@@ -42,6 +42,15 @@ class ProductServiceTest {
     }
 
     @Test
+    void relatedProductsAreFromTheSameSportWithoutTheProductItself() {
+        Product pace = service.findById("pace-500").orElseThrow();
+        List<Product> related = service.findRelated(pace, 4);
+        assertEquals(4, related.size());
+        assertTrue(related.stream().allMatch(p -> p.getSportId().equals("running") && !p.getId().equals("pace-500")));
+        assertTrue(service.findById("inconnu").isEmpty());
+    }
+
+    @Test
     void pagesAreClampedToExistingOnes() {
         Page<Product> page = find("running", null, false, null, ProductSort.RELEVANCE, 42);
         assertEquals(0, page.getNumber());
