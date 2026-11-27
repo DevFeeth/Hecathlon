@@ -31,11 +31,6 @@
             <small class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
         </label>
         <label>
-            <span th:text="#{user.username}">Nom d'utilisateur</span>
-            <input type="text" th:field="*{username}" autocomplete="username">
-            <small class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
-        </label>
-        <label>
             <span th:text="#{user.password}">Mot de passe</span>
             <!-- no th:field on purpose: the password is never sent back to the browser -->
             <input type="password" name="password" autocomplete="new-password">

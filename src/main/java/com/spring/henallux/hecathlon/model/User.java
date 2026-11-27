@@ -8,12 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 public class User implements UserDetails {
-
-    @NotBlank
-    @Size(min = 4, max = 30)
-    private String username;
 
     @NotBlank
     @Size(min = 8, max = 100)
@@ -46,8 +43,9 @@ public class User implements UserDetails {
     @Override
     public String getPassword() { return password; }
 
+    // Spring Security's "username" is the email address
     @Override
-    public String getUsername() { return username; }
+    public String getUsername() { return email; }
 
     @Override
     public boolean isAccountNonExpired() { return accountNonExpired; }
@@ -61,7 +59,6 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() { return enabled; }
 
-    public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setAuthorities(List<Authority> authorities) { this.authorities = authorities; }
     public void setAccountNonExpired(Boolean accountNonExpired) { this.accountNonExpired = accountNonExpired; }
@@ -74,5 +71,6 @@ public class User implements UserDetails {
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
     public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    // stored trimmed and lower-case so "Alex@Mail.com" and "alex@mail.com" are the same account
+    public void setEmail(String email) { this.email = email == null ? null : email.trim().toLowerCase(Locale.ROOT); }
 }

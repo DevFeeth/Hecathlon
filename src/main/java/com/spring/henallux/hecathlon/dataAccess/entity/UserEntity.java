@@ -9,8 +9,8 @@ import java.util.List;
 public class UserEntity {
 
     @Id
-    @Column(name = "username")
-    private String username;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -20,9 +20,6 @@ public class UserEntity {
 
     @Column(name = "last_name", nullable = false)
     private String lastName;
-
-    @Column(name = "email", nullable = false)
-    private String email;
 
     @Column(name = "account_non_expired")
     private Boolean accountNonExpired = true;
@@ -39,15 +36,13 @@ public class UserEntity {
     @ManyToMany (fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_authority",
-            joinColumns = @JoinColumn(name = "username", referencedColumnName = "username"),
+            joinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"),
             inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id")
     )
     private List<AuthorityEntity> authorities;
 
     public UserEntity() {}
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public String getFirstName() { return firstName; }

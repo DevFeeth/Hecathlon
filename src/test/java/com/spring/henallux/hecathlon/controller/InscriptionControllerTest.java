@@ -15,6 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -40,43 +41,47 @@ class InscriptionControllerTest {
     @MockitoBean
     private UserDataAccess userDataAccess;
 
-    private static MockHttpServletRequestBuilder signUp(String username) {
+    private static MockHttpServletRequestBuilder signUp(String email) {
+        return signUp(email, "motdepasse123");
+    }
+
+    private static MockHttpServletRequestBuilder signUp(String email, String password) {
         return post("/inscription").with(csrf())
-                .param("username", username)
-                .param("password", "motdepasse123")
+                .param("email", email)
+                .param("password", password)
                 .param("firstName", "Alex")
-                .param("lastName", "Martin")
-                .param("email", "alex@example.com");
+                .param("lastName", "Martin");
     }
 
     @Test
-    void validSignUpSavesHashedPasswordAndRedirectsToLogin() throws Exception {
-        mockMvc.perform(signUp("alexm"))
+    void validSignUpSavesHashedPasswordAndNormalisedEmail() throws Exception {
+        mockMvc.perform(signUp(" Alex@Example.com "))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?registered"));
 
         ArgumentCaptor<User> saved = ArgumentCaptor.forClass(User.class);
         verify(userDataAccess).save(saved.capture());
         assertTrue(passwordEncoder.matches("motdepasse123", saved.getValue().getPassword()));
+        assertEquals("alex@example.com", saved.getValue().getEmail());
     }
 
     @Test
-    void existingUsernameIsRejectedWithoutSaving() throws Exception {
-        when(userDataAccess.findByUsername("alexm")).thenReturn(new User());
+    void existingEmailIsRejectedWithoutSaving() throws Exception {
+        when(userDataAccess.findByEmail("alex@example.com")).thenReturn(new User());
 
-        mockMvc.perform(signUp("alexm"))
+        mockMvc.perform(signUp("ALEX@example.com"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("inscription"))
-                .andExpect(model().attributeHasFieldErrorCode("userForm", "username", "username.taken"));
+                .andExpect(model().attributeHasFieldErrorCode("userForm", "email", "email.taken"));
 
         verify(userDataAccess, never()).save(any());
     }
 
     @Test
     void invalidFormIsRejectedWithoutSaving() throws Exception {
-        mockMvc.perform(signUp("ab").param("email", "pas-un-email"))
+        mockMvc.perform(signUp("pas-un-email", "court"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeHasFieldErrors("userForm", "username", "email"));
+                .andExpect(model().attributeHasFieldErrors("userForm", "email", "password"));
 
         verify(userDataAccess, never()).save(any());
     }

@@ -9,6 +9,7 @@ public class Product {
     private String name;
     private String brand;
     private String sportId;
+    private String category;
     private String description;
     private double rating;
     private int reviewCount;
@@ -17,13 +18,14 @@ public class Product {
     private boolean bestSeller;
     private String image;
 
-    public Product(String id, String name, String brand, String sportId, String description,
+    public Product(String id, String name, String brand, String sportId, String category, String description,
                    double rating, int reviewCount, BigDecimal price, BigDecimal oldPrice,
                    boolean bestSeller, String image) {
         this.id = id;
         this.name = name;
         this.brand = brand;
         this.sportId = sportId;
+        this.category = category;
         this.description = description;
         this.rating = rating;
         this.reviewCount = reviewCount;
@@ -37,6 +39,7 @@ public class Product {
     public String getName() { return name; }
     public String getBrand() { return brand; }
     public String getSportId() { return sportId; }
+    public String getCategory() { return category; }
     public String getDescription() { return description; }
     public double getRating() { return rating; }
     public int getReviewCount() { return reviewCount; }

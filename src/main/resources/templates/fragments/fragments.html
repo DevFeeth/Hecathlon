@@ -24,7 +24,7 @@
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
                 <button type="submit">
                     <svg th:replace="~{fragments/icons.html :: user}"></svg>
-                    <span><strong sec:authentication="principal.username">user</strong> · <span th:text="#{header.logout}">Déconnexion</span></span>
+                    <span><strong sec:authentication="principal.firstName">user</strong> · <span th:text="#{header.logout}">Déconnexion</span></span>
                 </button>
             </form>
 
@@ -40,7 +40,7 @@
     <nav class="main-nav">
         <div class="container">
             <a th:href="@{/sports}" th:text="#{nav.allSports}">Tous les sports</a>
-            <a href="#" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
+            <a th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
             <a href="#" class="promo" th:text="#{nav.promotions}">Promotions</a>
         </div>
     </nav>
@@ -58,6 +58,21 @@
          th:text="${#numbers.formatDecimal(p.oldPrice, 1, 2, 'COMMA')} + ' €'">0,00 €</del>
 </p>
 
+<!-- Product card used in every product grid -->
+<a th:fragment="productCard(p)" class="product-card" href="#">
+        <div class="product-media">
+            <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
+            <span class="badge sale" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + ' %'">-10 %</span>
+            <span class="badge" th:if="${p.discountPercent == 0 and p.bestSeller}" th:text="#{product.bestSeller}">Meilleure vente</span>
+        </div>
+        <p class="kicker muted" th:text="${p.brand}">Marque</p>
+        <h3 th:text="${p.name}">Produit</h3>
+        <small th:text="${p.description}">Description</small>
+        <small class="rating">★ <span th:text="${#numbers.formatDecimal(p.rating, 1, 1, 'COMMA')}">4,5</span>
+            (<span th:text="${p.reviewCount}">0</span>)</small>
+        <p th:replace="~{fragments/fragments.html :: price(${p})}"></p>
+</a>
+
 <footer th:fragment="footer" class="site-footer">
     <div class="container footer-grid">
         <div>
@@ -72,7 +87,7 @@
         </div>
         <div>
             <h3 th:text="#{nav.allSports}">Tous les sports</h3>
-            <a href="#" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
+            <a th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
         </div>
     </div>
     <div class="container footer-bottom">

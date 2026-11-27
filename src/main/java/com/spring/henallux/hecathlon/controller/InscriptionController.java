@@ -35,9 +35,9 @@ public class InscriptionController {
 
     @PostMapping
     public String send(Model model, @Valid @ModelAttribute("userForm") User userForm, BindingResult errors) {
-        // username is the primary key: saving an existing one would overwrite that account
-        if (!errors.hasFieldErrors("username") && userDataAccess.findByUsername(userForm.getUsername()) != null) {
-            errors.rejectValue("username", "username.taken");
+        // email is the primary key: saving an existing one would overwrite that account
+        if (!errors.hasFieldErrors("email") && userDataAccess.findByEmail(userForm.getEmail()) != null) {
+            errors.rejectValue("email", "email.taken");
         }
         if (errors.hasErrors()) {
             model.addAttribute("title", "Hecathlon");

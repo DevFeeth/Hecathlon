@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ProductTest {
 
     private static Product product(String price, String oldPrice) {
-        return new Product("id", "name", "brand", "running", "", 0, 0,
+        return new Product("id", "name", "brand", "running", "shoes", "", 0, 0,
                 new BigDecimal(price), oldPrice == null ? null : new BigDecimal(oldPrice), false, null);
     }
 

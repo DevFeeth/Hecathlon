@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content" th:with="sportName=#{${'sport.' + sport.id}}">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/sports}" th:text="#{nav.allSports}">Tous les sports</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="${sportName}">Sport</span>
+        </nav>
+    </div>
+
+    <!-- Banner -->
+    <section class="container">
+        <div class="split-banner sport-banner">
+            <div class="split-banner-text">
+                <p class="kicker accent" th:text="#{sport.kicker}">Prenez votre élan</p>
+                <h1 th:text="${sportName}">Sport</h1>
+                <p th:text="#{${'sport.' + sport.id + '.description'}}">Description</p>
+            </div>
+            <div th:replace="~{fragments/fragments.html :: media(${sport.image}, ${sport.id})}"></div>
+        </div>
+    </section>
+
+    <!-- Category tabs -->
+    <nav class="container tabs" th:attr="aria-label=#{catalog.categories}">
+        <a th:href="@{/sports/{id}(id=${sport.id})}" th:classappend="${category == null} ? 'active'"
+           th:text="#{${'sport.' + sport.id + '.all'}}">Tout</a>
+        <a th:each="c : ${sport.categories}" th:href="@{/sports/{id}(id=${sport.id}, categorie=${c})}"
+           th:classappend="${c == category} ? 'active'" th:text="#{${'category.' + c}}">Catégorie</a>
+    </nav>
+
+    <section class="container catalog">
+        <!-- Filters: one GET form, also used by the sort select and the page buttons (form="filters") -->
+        <aside class="filters">
+            <form id="filters" method="get" th:action="@{/sports/{id}(id=${sport.id})}">
+                <input type="hidden" name="categorie" th:if="${category != null}" th:value="${category}">
+                <div class="filters-head">
+                    <h2 th:text="#{filters.title}">Filtrer</h2>
+                    <a class="link" th:href="@{/sports/{id}(id=${sport.id}, categorie=${category})}" th:text="#{filters.clear}">Tout effacer</a>
+                </div>
+                <fieldset>
+                    <legend th:text="#{filters.budget}">Budget</legend>
+                    <label>
+                        <span th:text="#{filters.maxPrice}">Prix maximum (€)</span>
+                        <input type="number" name="prixMax" min="0" step="1" th:value="${prixMax}" placeholder="200">
+                    </label>
+                </fieldset>
+                <fieldset>
+                    <legend th:text="#{filters.promo}">Promotions</legend>
+                    <label class="check">
+                        <input type="checkbox" name="promo" value="true" th:checked="${promo}">
+                        <span th:text="#{filters.promoOnly}">Articles en promotion uniquement</span>
+                    </label>
+                </fieldset>
+                <button class="btn btn-primary" type="submit" th:text="#{filters.apply}">Appliquer</button>
+            </form>
+        </aside>
+
+        <div class="results">
+            <div class="results-head">
+                <p>
+                    <strong th:text="${category == null} ? ${sportName} : #{${'category.' + category}}">Sport</strong>
+                    — <span th:text="#{sports.articles(${products.totalElements})}">0 article</span>
+                </p>
+                <label class="sort">
+                    <span th:text="#{sort.label}">Trier par</span>
+                    <select name="tri" form="filters" onchange="this.form.submit()">
+                        <option th:each="s : ${sorts}" th:value="${s.param}" th:selected="${s == sort}"
+                                th:text="#{${'sort.' + s.param}}">Pertinence</option>
+                    </select>
+                </label>
+            </div>
+
+            <p class="empty" th:if="${products.empty}" th:text="#{catalog.empty}">Aucun article.</p>
+
+            <div class="grid grid-3">
+                <th:block th:each="p : ${products.content}"><a th:replace="~{fragments/fragments.html :: productCard(${p})}"></a></th:block>
+            </div>
+
+            <nav class="pagination" th:if="${products.totalElements > 0}" th:attr="aria-label=#{catalog.pagination}">
+                <p th:text="#{catalog.seen(${products.number * products.size + products.numberOfElements}, ${products.totalElements})}">
+                    Vous avez vu 9 articles sur 18</p>
+                <div th:if="${products.totalPages > 1}">
+                    <button type="submit" form="filters" name="page"
+                            th:each="i : ${#numbers.sequence(1, products.totalPages)}"
+                            th:value="${i}" th:text="${i}"
+                            th:classappend="${i == products.number + 1} ? 'active'"
+                            th:attrappend="aria-current=${i == products.number + 1} ? 'page'">1</button>
+                </div>
+            </nav>
+        </div>
+    </section>
+
+    <section class="container section seo">
+        <h2 th:text="#{${'sport.' + sport.id + '.seoTitle'}}">Titre</h2>
+        <p th:text="#{${'sport.' + sport.id + '.seoText'}}">Texte</p>
+    </section>
+
+</main>
+</body>
+</html>

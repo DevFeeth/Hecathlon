@@ -17,8 +17,8 @@
 
     <form class="form" th:action="@{/login}" method="post">
         <label>
-            <span th:text="#{user.username}">Nom d'utilisateur</span>
-            <input type="text" name="username" autocomplete="username" required autofocus>
+            <span th:text="#{user.email}">Adresse e-mail</span>
+            <input type="email" name="email" autocomplete="email" required autofocus>
         </label>
         <label>
             <span th:text="#{user.password}">Mot de passe</span>

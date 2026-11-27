@@ -32,8 +32,8 @@ public class UserDao implements UserDataAccess{
     }
 
     @Override
-    public User findByUsername(String username) {
-        UserEntity entity = userRepository.findByUsername(username);
+    public User findByEmail(String email) {
+        UserEntity entity = userRepository.findByEmail(email);
         return entity != null ? userMapper.userEntityToUserModel(entity) : null;
     }
 

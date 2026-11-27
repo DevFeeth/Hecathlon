@@ -188,3 +188,44 @@ img { max-width: 100%; display: block; }
     .split-banner { grid-template-columns: 1fr; }
     .page-head-sub { flex-direction: column; }
 }
+
+/* ===== Sport page ===== */
+.sport-banner .split-banner-text h1 { font-size: 40px; font-weight: 900; }
+.sport-banner .media { min-height: 240px; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.tabs a { padding: 9px 16px; border-radius: var(--radius); background: var(--light); font-size: 13px; font-weight: 600; }
+.tabs a:hover { background: var(--border); }
+.tabs a.active { background: var(--blue); color: #fff; }
+
+.catalog { display: grid; grid-template-columns: 220px 1fr; gap: 32px; margin-top: 32px; align-items: start; }
+
+.filters form { display: flex; flex-direction: column; gap: 20px; }
+.filters-head { display: flex; justify-content: space-between; align-items: baseline; }
+.filters-head h2 { font-size: 18px; }
+.filters fieldset { border: 0; border-top: 1px solid var(--border); padding: 16px 0 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.filters legend { font-size: 13px; font-weight: 700; padding: 0 0 8px; }
+.filters label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+.filters label.check { flex-direction: row; align-items: center; gap: 8px; color: var(--text); }
+.filters input[type="number"] { font: inherit; padding: 8px 10px; border: 1px solid #c7cad1; border-radius: var(--radius); }
+.filters input[type="checkbox"] { accent-color: var(--blue); width: 16px; height: 16px; }
+.filters button { border: 0; cursor: pointer; }
+
+.results-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; font-size: 14px; }
+.sort { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.sort select { font: inherit; color: var(--text); padding: 8px 10px; border: 1px solid #c7cad1; border-radius: var(--radius); background: #fff; }
+.empty { padding: 48px 0; text-align: center; color: var(--muted); }
+
+.pagination { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 40px; font-size: 13px; color: var(--muted); }
+.pagination div { display: flex; gap: 6px; }
+.pagination button { font: inherit; min-width: 36px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--blue); cursor: pointer; }
+.pagination button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.seo { border-top: 1px solid var(--border); padding-top: 32px; }
+.seo h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+.seo p { color: var(--muted); max-width: 900px; }
+
+@media (max-width: 900px) {
+    .catalog { grid-template-columns: 1fr; }
+    .results .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}

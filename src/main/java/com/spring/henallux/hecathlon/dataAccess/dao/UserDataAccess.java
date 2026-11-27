@@ -6,5 +6,5 @@ import java.util.ArrayList;
 
 public interface UserDataAccess {
     User save(User user);
-    User findByUsername(String username);
+    User findByEmail(String email);
 }
