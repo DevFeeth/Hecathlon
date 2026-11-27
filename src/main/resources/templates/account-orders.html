@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/compte}" th:text="#{header.account}">Mon compte</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{account.menu.orders}">Mes commandes</span>
+        </nav>
+    </div>
+
+    <section class="container account">
+        <aside th:replace="~{fragments/account.html :: menu('orders')}"></aside>
+
+        <div class="account-content">
+            <h1 th:text="#{account.menu.orders}">Mes commandes</h1>
+            <p class="muted" th:text="#{account.orders.subtitle}">Vos envies sportives, de la commande au terrain.</p>
+
+            <div th:replace="~{fragments/account.html :: figures}"></div>
+
+            <nav class="tabs account-tabs" th:attr="aria-label=#{account.menu.orders}">
+                <a th:href="@{/compte/commandes}" th:classappend="${filter == null or (filter != 'en-cours' and filter != 'livrees')} ? 'active'"
+                   th:text="#{account.orders.all}">Toutes les commandes</a>
+                <a th:href="@{/compte/commandes(filtre='en-cours')}" th:classappend="${filter == 'en-cours'} ? 'active'"
+                   th:text="#{account.orders.inProgress(${inProgressCount})}">En cours (0)</a>
+                <a th:href="@{/compte/commandes(filtre='livrees')}" th:classappend="${filter == 'livrees'} ? 'active'"
+                   th:text="#{account.orders.delivered(${deliveredCount})}">Livrées (0)</a>
+            </nav>
+
+            <th:block th:each="o : ${shownOrders}">
+                <article th:replace="~{fragments/account.html :: orderCard(${o})}"></article>
+            </th:block>
+            <div class="account-empty" th:if="${shownOrders.empty}">
+                <p th:text="#{account.orders.none}">Aucune commande ici pour l'instant.</p>
+                <a class="btn btn-primary" th:href="@{/sports}" th:text="#{cart.emptyCta}">Découvrir nos sports</a>
+            </div>
+
+            <div th:replace="~{fragments/account.html :: bottomBoxes}"></div>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

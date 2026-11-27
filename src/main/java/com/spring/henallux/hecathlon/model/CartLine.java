@@ -3,10 +3,8 @@ package com.spring.henallux.hecathlon.model;
 import java.math.BigDecimal;
 
 public class CartLine {
-
     private final String key;
     private final Product product;
-    // null when the product has a single size
     private final String size;
     private int quantity;
 

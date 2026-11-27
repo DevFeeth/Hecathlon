@@ -9,7 +9,7 @@
     <title></title>
 </head>
 <body>
-<main layout:fragment="main-content" th:with="sportName=#{${'sport.' + sport.id}}">
+<main layout:fragment="main-content" th:with="sportName=${sport.getName(#locale.language)}">
 
     <div class="container page-head">
         <nav class="breadcrumb" aria-label="Fil d'Ariane">
@@ -21,28 +21,25 @@
         </nav>
     </div>
 
-    <!-- Banner -->
     <section class="container">
         <div class="split-banner sport-banner">
             <div class="split-banner-text">
                 <p class="kicker accent" th:text="#{sport.kicker}">Prenez votre élan</p>
                 <h1 th:text="${sportName}">Sport</h1>
-                <p th:text="#{${'sport.' + sport.id + '.description'}}">Description</p>
+                <p th:text="${sport.getDescription(#locale.language)}">Description</p>
             </div>
             <div th:replace="~{fragments/fragments.html :: media(${sport.image}, ${sport.id})}"></div>
         </div>
     </section>
 
-    <!-- Category tabs -->
     <nav class="container tabs" th:attr="aria-label=#{catalog.categories}">
         <a th:href="@{/sports/{id}(id=${sport.id})}" th:classappend="${category == null} ? 'active'"
-           th:text="#{${'sport.' + sport.id + '.all'}}">Tout</a>
-        <a th:each="c : ${sport.categories}" th:href="@{/sports/{id}(id=${sport.id}, categorie=${c})}"
-           th:classappend="${c == category} ? 'active'" th:text="#{${'category.' + c}}">Catégorie</a>
+           th:text="#{catalog.all}">Tout voir</a>
+        <a th:each="t : ${types}" th:href="@{/sports/{id}(id=${sport.id}, categorie=${t.id})}"
+           th:classappend="${t.id == category} ? 'active'" th:text="${t.getName(#locale.language)}">Catégorie</a>
     </nav>
 
     <section class="container catalog">
-        <!-- Filters: one GET form, also used by the sort select and the page buttons (form="filters") -->
         <aside class="filters">
             <form id="filters" method="get" th:action="@{/sports/{id}(id=${sport.id})}">
                 <input type="hidden" name="categorie" th:if="${category != null}" th:value="${category}">
@@ -71,7 +68,7 @@
         <div class="results">
             <div class="results-head">
                 <p>
-                    <strong th:text="${category == null} ? ${sportName} : #{${'category.' + category}}">Sport</strong>
+                    <strong th:text="${selectedType == null} ? ${sportName} : ${selectedType.getName(#locale.language)}">Sport</strong>
                     — <span th:text="#{sports.articles(${products.totalElements})}">0 article</span>
                 </p>
                 <label class="sort">
@@ -103,10 +100,6 @@
         </div>
     </section>
 
-    <section class="container section seo">
-        <h2 th:text="#{${'sport.' + sport.id + '.seoTitle'}}">Titre</h2>
-        <p th:text="#{${'sport.' + sport.id + '.seoText'}}">Texte</p>
-    </section>
 
 </main>
 </body>

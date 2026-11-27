@@ -3,7 +3,6 @@ package com.spring.henallux.hecathlon.model;
 import org.springframework.security.core.GrantedAuthority;
 
 public class Authority implements GrantedAuthority {
-
     private Integer id;
     private String name;
 

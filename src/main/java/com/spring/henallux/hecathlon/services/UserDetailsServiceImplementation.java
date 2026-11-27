@@ -12,7 +12,6 @@ import java.util.Locale;
 
 @Service
 public class UserDetailsServiceImplementation implements UserDetailsService {
-
     private final UserDataAccess userDAO;
 
     @Autowired
@@ -21,7 +20,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     }
 
     @Override
-    // "username" is the email typed in the login form
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDAO.findByEmail(username.trim().toLowerCase(Locale.ROOT));
         if (user == null) {

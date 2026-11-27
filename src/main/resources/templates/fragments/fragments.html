@@ -9,23 +9,26 @@
     <div class="container header-main">
         <a class="logo" th:href="@{/}">HECATHLON</a>
 
-        <!-- shortcut: search is not wired yet, it reloads the home page -->
         <form class="search" role="search" th:action="@{/}" method="get">
             <svg th:replace="~{fragments/icons.html :: search}"></svg>
             <input type="search" name="q" th:placeholder="#{header.search}" th:attr="aria-label=#{header.search}">
         </form>
 
         <div class="header-actions">
-            <a href="#"><svg th:replace="~{fragments/icons.html :: pin}"></svg><span th:text="#{header.store}">Mon magasin</span></a>
+            <a th:href="@{/a-propos}"><svg th:replace="~{fragments/icons.html :: store}"></svg><span th:text="#{header.about}">À propos</span></a>
 
             <a sec:authorize="!isAuthenticated()" th:href="@{/login}">
-                <svg th:replace="~{fragments/icons.html :: user}"></svg><span th:text="#{header.account}">Mon compte</span>
+                <svg th:replace="~{fragments/icons.html :: user}"></svg><span th:text="#{header.login}">Se connecter</span>
+            </a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login} + '#inscription'" class="header-signup">
+                <svg th:replace="~{fragments/icons.html :: pin}"></svg><span th:text="#{header.signup}">S'inscrire</span>
+            </a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/compte}" class="header-hello">
+                <svg th:replace="~{fragments/icons.html :: user}"></svg>
+                <span th:text="#{header.hello(${#authentication.principal.firstName})}">Bonjour</span>
             </a>
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
-                <button type="submit">
-                    <svg th:replace="~{fragments/icons.html :: user}"></svg>
-                    <span><strong sec:authentication="principal.firstName">user</strong> · <span th:text="#{header.logout}">Déconnexion</span></span>
-                </button>
+                <button type="submit"><svg th:replace="~{fragments/icons.html :: lock}"></svg><span th:text="#{header.logout}">Déconnexion</span></button>
             </form>
 
             <a th:href="@{/panier}"><svg th:replace="~{fragments/icons.html :: bag}"></svg><span th:text="#{header.cart(${session.cart != null ? session.cart.itemCount : 0})}">Panier (0)</span></a>
@@ -40,13 +43,12 @@
     <nav class="main-nav">
         <div class="container">
             <a th:href="@{/sports}" th:text="#{nav.allSports}">Tous les sports</a>
-            <a th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
+            <a th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}" th:text="${sport.getName(#locale.language)}">Sport</a>
             <a href="#" class="promo" th:text="#{nav.promotions}">Promotions</a>
         </div>
     </nav>
 </header>
 
-<!-- Picture of a sport/product: shows the image when set, otherwise a coloured placeholder for the sport -->
 <div th:fragment="media(image, sportId)" class="media" th:classappend="'ph-' + ${sportId}">
     <img th:if="${image != null}" th:src="@{${image}}" alt="">
 </div>
@@ -58,7 +60,6 @@
          th:text="${#numbers.formatDecimal(p.oldPrice, 1, 2, 'COMMA')} + ' €'">0,00 €</del>
 </p>
 
-<!-- Product card used in every product grid -->
 <a th:fragment="productCard(p)" class="product-card" th:href="@{/produits/{id}(id=${p.id})}">
         <div class="product-media">
             <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
@@ -80,6 +81,12 @@
             <p th:text="#{footer.tagline}">Le sport nous rassemble.</p>
         </div>
         <div>
+            <h3>Hecathlon</h3>
+            <a th:href="@{/a-propos}" th:text="#{header.about}">À propos</a>
+            <a th:href="@{/sports}" th:text="#{nav.allSports}">Tous les sports</a>
+            <a th:href="@{/panier}" th:text="#{breadcrumb.cart}">Mon panier</a>
+        </div>
+        <div>
             <h3 th:text="#{footer.help}">Besoin d'aide ?</h3>
             <a href="#" th:text="#{footer.orders}">Suivre ma commande</a>
             <a href="#" th:text="#{footer.delivery}">Livraison &amp; retrait</a>
@@ -87,7 +94,7 @@
         </div>
         <div>
             <h3 th:text="#{nav.allSports}">Tous les sports</h3>
-            <a th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}" th:text="#{${'sport.' + sport.id}}">Sport</a>
+            <a th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}" th:text="${sport.getName(#locale.language)}">Sport</a>
         </div>
     </div>
     <div class="container footer-bottom">

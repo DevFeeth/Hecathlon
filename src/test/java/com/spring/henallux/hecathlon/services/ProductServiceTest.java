@@ -1,64 +1,95 @@
 package com.spring.henallux.hecathlon.services;
 
+import com.spring.henallux.hecathlon.TestCatalog;
+import com.spring.henallux.hecathlon.dataAccess.dao.ProductDataAccess;
 import com.spring.henallux.hecathlon.model.Product;
 import com.spring.henallux.hecathlon.model.ProductSort;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
+    @Mock
+    private ProductDataAccess productDataAccess;
 
-    private final ProductService service = new ProductService();
+    @InjectMocks
+    private ProductService productService;
 
-    private Page<Product> find(String sport, String category, boolean promo, String maxPrice, ProductSort sort, int page) {
-        return service.findBySport(sport, category, promo, maxPrice == null ? null : new BigDecimal(maxPrice), sort, page);
+    @Test
+    void searchUsesPageSizeAndChosenSort() {
+        when(productDataAccess.search(eq("running"), eq("shoes"), eq(true), eq(new BigDecimal("100")), any()))
+                .thenAnswer(invocation -> new PageImpl<>(List.of(TestCatalog.pace500()), invocation.getArgument(4), 1));
+
+        Page<Product> page = productService.findBySport("running", "shoes", true, new BigDecimal("100"), ProductSort.PRICE_DESC, 0);
+
+        ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
+        verify(productDataAccess).search(eq("running"), eq("shoes"), eq(true), eq(new BigDecimal("100")), pageable.capture());
+        assertEquals(ProductService.PAGE_SIZE, pageable.getValue().getPageSize());
+        assertEquals(Sort.Direction.DESC, pageable.getValue().getSort().getOrderFor("price").getDirection());
+        assertEquals(1, page.getTotalElements());
     }
 
     @Test
-    void filtersBySportCategoryPromoAndMaxPrice() {
-        assertTrue(find("running", null, false, null, ProductSort.RELEVANCE, 0).stream()
-                .allMatch(p -> p.getSportId().equals("running")));
-        assertTrue(find("football", "balls", false, null, ProductSort.RELEVANCE, 0).stream()
-                .allMatch(p -> p.getCategory().equals("balls")));
-        assertTrue(find("cycling", null, true, null, ProductSort.RELEVANCE, 0).stream()
-                .allMatch(p -> p.getDiscountPercent() > 0));
-        assertTrue(find("cycling", null, false, "79.99", ProductSort.RELEVANCE, 0).stream()
-                .allMatch(p -> p.getPrice().compareTo(new BigDecimal("79.99")) <= 0));
-    }
+    void pageAfterTheLastOneShowsTheLastPage() {
+        when(productDataAccess.search(eq("running"), eq(null), eq(false), eq(null), any()))
+                .thenAnswer(invocation -> {
+                    Pageable asked = invocation.getArgument(4);
+                    List<Product> content = asked.getPageNumber() == 0 ? List.of(TestCatalog.pace500()) : List.of();
+                    return new PageImpl<>(content, asked, 1);
+                });
 
-    @Test
-    void sortsByPriceAndRating() {
-        List<Product> asc = find("cycling", null, false, null, ProductSort.PRICE_ASC, 0).getContent();
-        assertEquals(asc.stream().sorted(Comparator.comparing(Product::getPrice)).toList(), asc);
+        Page<Product> page = productService.findBySport("running", null, false, null, ProductSort.RELEVANCE, 42);
 
-        List<Product> best = find("running", null, false, null, ProductSort.RATING, 0).getContent();
-        assertEquals(4.8, best.getFirst().getRating());
-    }
-
-    @Test
-    void relatedProductsAreFromTheSameSportWithoutTheProductItself() {
-        Product pace = service.findById("pace-500").orElseThrow();
-        List<Product> related = service.findRelated(pace, 4);
-        assertEquals(4, related.size());
-        assertTrue(related.stream().allMatch(p -> p.getSportId().equals("running") && !p.getId().equals("pace-500")));
-        assertTrue(service.findById("inconnu").isEmpty());
-    }
-
-    @Test
-    void pagesAreClampedToExistingOnes() {
-        Page<Product> page = find("running", null, false, null, ProductSort.RELEVANCE, 42);
         assertEquals(0, page.getNumber());
-        assertEquals(6, page.getTotalElements());
-
-        Page<Product> none = find("running", null, false, "1", ProductSort.RELEVANCE, 0);
-        assertTrue(none.isEmpty());
-        assertEquals(0, none.getTotalElements());
+        assertEquals(1, page.getContent().size());
+        verify(productDataAccess, times(2)).search(eq("running"), eq(null), eq(false), eq(null), any());
     }
 
+    @Test
+    void negativePageIsTheFirstPage() {
+        when(productDataAccess.search(any(), any(), eq(false), any(), any()))
+                .thenAnswer(invocation -> new PageImpl<>(List.of(), invocation.getArgument(4), 0));
+
+        productService.findBySport("running", null, false, null, ProductSort.RELEVANCE, -3);
+
+        verify(productDataAccess).search(eq("running"), eq(null), eq(false), eq(null),
+                eq(PageRequest.of(0, ProductService.PAGE_SIZE, ProductSort.RELEVANCE.getSort())));
+    }
+
+    @Test
+    void relatedProductsExcludeTheProductItself() {
+        Product pace = TestCatalog.pace500();
+        when(productDataAccess.findOthersOfSport("running", List.of("pace-500"), 4)).thenReturn(List.of(TestCatalog.air100()));
+
+        List<Product> related = productService.findRelated(pace, 4);
+
+        assertEquals("air-100", related.getFirst().getId());
+    }
+
+    @Test
+    void unknownProductIsEmpty() {
+        when(productDataAccess.findById("inconnu")).thenReturn(null);
+
+        assertTrue(productService.findById("inconnu").isEmpty());
+    }
 }

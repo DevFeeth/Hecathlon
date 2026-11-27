@@ -15,7 +15,6 @@ import java.util.Locale;
 
 @Configuration
 public class MainConfiguration implements WebMvcConfigurer {
-
     @Bean
     public DefaultMessageCodesResolver defaultMessageCodesResolver() {
         return new DefaultMessageCodesResolver();

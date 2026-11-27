@@ -10,7 +10,7 @@
 </head>
 <body>
 <main layout:fragment="main-content"
-      th:with="p=${product}, sportName=#{${'sport.' + sport.id}}, categoryName=#{${'category.' + p.category}}">
+      th:with="p=${product}, sportName=${sport.getName(#locale.language)}, categoryName=${product.type.getName(#locale.language)}">
 
     <div class="container page-head">
         <nav class="breadcrumb" aria-label="Fil d'Ariane">
@@ -18,7 +18,7 @@
             <span aria-hidden="true">/</span>
             <a th:href="@{/sports/{id}(id=${sport.id})}" th:text="${sportName}">Sport</a>
             <span aria-hidden="true">/</span>
-            <a th:href="@{/sports/{id}(id=${sport.id}, categorie=${p.category})}" th:text="${categoryName}">Catégorie</a>
+            <a th:href="@{/sports/{id}(id=${sport.id}, categorie=${p.type.id})}" th:text="${categoryName}">Catégorie</a>
             <span aria-hidden="true">/</span>
             <span aria-current="page" th:text="${p.name}">Produit</span>
         </nav>
@@ -49,6 +49,7 @@
             <p class="product-description" th:text="${p.longDescription}">Description</p>
 
             <form class="product-buy" th:action="@{/panier/ajouter}" method="post">
+                <p class="alert alert-error" th:if="${param.quantite != null}" th:text="#{quantity.invalid}">Quantité invalide.</p>
                 <input type="hidden" name="productId" th:value="${p.id}">
                 <p class="alert alert-error" th:if="${param.taille != null}" th:text="#{product.chooseSize}">Choisissez une taille.</p>
                 <fieldset class="sizes" th:unless="${p.sizes.empty}">
@@ -59,12 +60,18 @@
                     </label>
                 </fieldset>
 
+                <label class="quantity-field">
+                    <span th:text="#{cart.quantity}">Quantité</span>
+                    <input type="number" name="quantity" value="1" min="1" max="10" step="1" required>
+                </label>
+
                 <p class="stock" th:text="#{product.inStock}">En stock · Expédition sous 24 h</p>
 
                 <button class="btn btn-primary btn-block" type="submit"
-                        th:text="#{product.addToCart} + ' — ' + ${#numbers.formatDecimal(p.price, 1, 2, 'COMMA')} + ' €'">
+                        th:text="#{product.addToCart}">
                     Ajouter au panier — 89,99 €</button>
             </form>
+
 
             <ul class="product-perks">
                 <li th:each="perk : ${ {delivery: 'truck', pickup: 'store', returns: 'rotate'} }">
@@ -97,7 +104,7 @@
     <section class="container section" th:unless="${related.empty}">
         <div class="section-head">
             <h2 th:text="#{product.related}">Complétez votre équipement</h2>
-            <a class="link" th:href="@{/sports/{id}(id=${sport.id})}" th:text="#{${'sport.' + sport.id + '.all'}} + ' →'">Tout le sport →</a>
+            <a class="link" th:href="@{/sports/{id}(id=${sport.id})}" th:text="#{catalog.all} + ' →'">Tout voir →</a>
         </div>
         <div class="grid grid-4">
             <th:block th:each="r : ${related}"><a th:replace="~{fragments/fragments.html :: productCard(${r})}"></a></th:block>

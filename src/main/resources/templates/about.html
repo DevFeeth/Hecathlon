@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{header.about}">À propos</span>
+        </nav>
+        <p class="kicker accent" th:text="#{about.kicker}">Qui sommes-nous ?</p>
+        <h1 th:text="#{about.title}">Le sport nous rassemble.</h1>
+        <p class="muted about-intro" th:text="#{about.intro}">Présentation</p>
+    </div>
+
+    <section class="container about-grid">
+        <div class="split-banner">
+            <div th:replace="~{fragments/fragments.html :: media('/images/sports/running-banner.jpg', 'running')}"></div>
+            <div class="split-banner-text">
+                <h2 th:text="#{about.story.title}">Notre histoire</h2>
+                <p th:text="#{about.story.text}">Histoire</p>
+            </div>
+        </div>
+
+        <div class="about-values">
+            <div>
+                <svg th:replace="~{fragments/icons.html :: bag}"></svg>
+                <h3 th:text="#{about.value1.title}">Le bon équipement</h3>
+                <p class="muted" th:text="#{about.value1.text}">Texte</p>
+            </div>
+            <div>
+                <svg th:replace="~{fragments/icons.html :: wrench}"></svg>
+                <h3 th:text="#{about.value2.title}">Faire durer</h3>
+                <p class="muted" th:text="#{about.value2.text}">Texte</p>
+            </div>
+            <div>
+                <svg th:replace="~{fragments/icons.html :: lock}"></svg>
+                <h3 th:text="#{about.value3.title}">Acheter en confiance</h3>
+                <p class="muted" th:text="#{about.value3.text}">Texte</p>
+            </div>
+        </div>
+
+        <div class="account-box about-contact">
+            <h2 th:text="#{about.contact.title}">Nous contacter</h2>
+            <p class="muted">Hecathlon SRL · Rue Saint-Donat 130 · 5002 Namur · Belgique</p>
+            <p class="muted">contact@hecathlon.be · 081 00 00 00</p>
+            <p class="muted" th:text="#{about.contact.note}">Projet de cours.</p>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

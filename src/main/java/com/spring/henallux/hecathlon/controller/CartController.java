@@ -22,7 +22,6 @@ import java.util.List;
 @RequestMapping("/panier")
 @SessionAttributes({Constants.CART})
 public class CartController {
-
     private static final int SUGGESTIONS = 4;
 
     private final ProductService productService;
@@ -32,7 +31,6 @@ public class CartController {
         this.productService = productService;
     }
 
-    // only called when the session has no cart yet
     @ModelAttribute(Constants.CART)
     public Cart cart() {
         return new Cart();
@@ -63,7 +61,10 @@ public class CartController {
         } else if (!product.getSizes().contains(size)) {
             return "redirect:/produits/" + product.getId() + "?taille";
         }
-        cart.add(product, size, Math.clamp(quantity, 1, Cart.MAX_QUANTITY));
+        if (quantity < 1 || quantity > Cart.MAX_QUANTITY) {
+            return "redirect:/produits/" + product.getId() + "?quantite";
+        }
+        cart.add(product, size, quantity);
         return "redirect:/panier";
     }
 

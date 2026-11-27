@@ -1,26 +1,23 @@
 package com.spring.henallux.hecathlon.model;
 
-import java.util.Comparator;
+import org.springframework.data.domain.Sort;
 
-/** Sort orders offered on a sport page. The URL value is the lower-case name (e.g. ?tri=price_asc). */
 public enum ProductSort {
+    RELEVANCE(Sort.by("position")),
+    PRICE_ASC(Sort.by("price").and(Sort.by("position"))),
+    PRICE_DESC(Sort.by(Sort.Direction.DESC, "price").and(Sort.by("position"))),
+    RATING(Sort.by(Sort.Direction.DESC, "rating").and(Sort.by("position")));
 
-    RELEVANCE((a, b) -> 0), // keeps catalogue order
-    PRICE_ASC(Comparator.comparing(Product::getPrice)),
-    PRICE_DESC(Comparator.comparing(Product::getPrice).reversed()),
-    RATING(Comparator.comparingDouble(Product::getRating).reversed());
+    private final Sort sort;
 
-    private final Comparator<Product> comparator;
-
-    ProductSort(Comparator<Product> comparator) {
-        this.comparator = comparator;
+    ProductSort(Sort sort) {
+        this.sort = sort;
     }
 
-    public Comparator<Product> getComparator() { return comparator; }
+    public Sort getSort() { return sort; }
 
     public String getParam() { return name().toLowerCase(); }
 
-    /** Unknown or missing values fall back to RELEVANCE. */
     public static ProductSort fromParam(String param) {
         for (ProductSort sort : values()) {
             if (sort.getParam().equals(param)) {
@@ -29,5 +26,4 @@ public enum ProductSort {
         }
         return RELEVANCE;
     }
-
 }

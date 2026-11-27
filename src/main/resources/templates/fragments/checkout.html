@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<ol th:fragment="steps(current)" class="steps">
+    <li th:each="step, st : ${ {'cart', 'delivery', 'review', 'payment'} }"
+        th:classappend="${st.count < current} ? 'done' : (${st.count == current} ? 'active' : '')"
+        th:attrappend="aria-current=${st.count == current} ? 'step'">
+        <span th:text="${st.count < current} ? '✓' : ${st.count}">1</span>
+        <th:block th:text="#{${'cart.steps.' + step}}">Étape</th:block>
+    </li>
+</ol>
+
+<aside th:fragment="summary" class="cart-summary">
+    <div class="summary-box">
+        <h2 th:text="#{cart.summary}">Votre commande</h2>
+        <small class="muted" th:text="#{cart.summaryInfo}">Vendu et expédié par Hecathlon</small>
+        <ul class="summary-lines">
+            <li th:each="line : ${cart.lines}" th:with="p=${line.product}">
+                <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
+                <div>
+                    <p class="kicker muted" th:text="${p.brand}">Marque</p>
+                    <p class="summary-line-name" th:text="${p.name}">Produit</p>
+                    <small class="muted" th:if="${line.size != null}" th:text="#{cart.size(${line.size})}">Taille M</small>
+                    <p class="summary-line-qty">
+                        <small th:text="#{checkout.qty(${line.quantity})}">Qté : 1</small>
+                        <strong th:text="${#numbers.formatDecimal(line.total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+                    </p>
+                </div>
+            </li>
+        </ul>
+        <dl>
+            <dt th:text="#{cart.subtotal(${cart.itemCount})}">Sous-total</dt>
+            <dd th:text="${#numbers.formatDecimal(cart.subtotal, 1, 2, 'COMMA')} + ' €'">0,00 €</dd>
+            <dt th:text="#{checkout.deliveryCost}">Livraison</dt>
+            <dd th:if="${deliveryCost.signum() == 0}" class="free" th:text="#{cart.deliveryFree}">Offerte</dd>
+            <dd th:unless="${deliveryCost.signum() == 0}" th:text="${#numbers.formatDecimal(deliveryCost, 1, 2, 'COMMA')} + ' €'">4,99 €</dd>
+        </dl>
+        <div class="summary-total">
+            <span th:text="#{cart.total}">Total TTC</span>
+            <strong th:text="${#numbers.formatDecimal(total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+        </div>
+        <small class="muted">
+            <th:block th:text="#{cart.vat(${#numbers.formatDecimal(vat, 1, 2, 'COMMA')})}">Dont TVA</th:block>
+            <th:block th:if="${cart.savings.signum() > 0}"
+                      th:text="' · ' + #{cart.savings(${#numbers.formatDecimal(cart.savings, 1, 2, 'COMMA')})}"></th:block>
+        </small>
+        <small class="muted" th:text="#{cart.secure}">Paiement sécurisé</small>
+    </div>
+</aside>
+
+</body>
+</html>

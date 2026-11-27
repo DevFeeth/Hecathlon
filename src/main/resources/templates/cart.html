@@ -18,12 +18,7 @@
             <span aria-current="page" th:text="#{breadcrumb.cart}">Mon panier</span>
         </nav>
 
-        <ol class="steps">
-            <li class="active"><span>1</span> <th:block th:text="#{cart.steps.cart}">Panier</th:block></li>
-            <li><span>2</span> <th:block th:text="#{cart.steps.delivery}">Livraison</th:block></li>
-            <li><span>3</span> <th:block th:text="#{cart.steps.payment}">Paiement</th:block></li>
-            <li><span>4</span> <th:block th:text="#{cart.steps.confirmation}">Confirmation</th:block></li>
-        </ol>
+        <ol th:replace="~{fragments/checkout.html :: steps(1)}"></ol>
 
         <div class="section-head">
             <h1 th:text="#{cart.title(${cart.itemCount})}">Mon panier · 3 articles</h1>
@@ -54,6 +49,7 @@
                     <p class="kicker muted" th:text="${p.brand}">Marque</p>
                     <h2><a th:href="@{/produits/{id}(id=${p.id})}" th:text="${p.name}">Produit</a></h2>
                     <small class="muted" th:if="${line.size != null}" th:text="#{cart.size(${line.size})}">Taille 42</small>
+                    <small class="muted" th:text="#{cart.unitPrice(${#numbers.formatDecimal(p.price, 1, 2, 'COMMA')})}">Prix unitaire : 0,00 €</small>
                     <small class="stock" th:text="#{product.inStock}">En stock</small>
                     <div class="cart-line-actions">
                         <form class="qty" th:action="@{/panier/quantite}" method="post">
@@ -95,8 +91,7 @@
                     <th:block th:if="${cart.savings.signum() > 0}"
                               th:text="' · ' + #{cart.savings(${#numbers.formatDecimal(cart.savings, 1, 2, 'COMMA')})}"> · Vous économisez</th:block>
                 </small>
-                <!-- shortcut: checkout (delivery, payment, order) does not exist yet; link this button to it when it does -->
-                <button class="btn btn-primary btn-block" type="button" th:text="#{cart.checkout} + ' →'">Passer ma commande →</button>
+                <a class="btn btn-primary btn-block" th:href="@{/commande/livraison}" th:text="#{cart.checkout} + ' →'">Passer ma commande →</a>
                 <small class="muted" th:text="#{cart.secure}">Paiement sécurisé</small>
             </div>
             <div class="summary-box summary-payment">

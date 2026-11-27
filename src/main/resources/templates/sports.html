@@ -30,10 +30,10 @@
             <a class="sport-card" th:href="@{/sports/{id}(id=${sport.id})}" th:each="sport : ${sports}">
                 <div th:replace="~{fragments/fragments.html :: media(${sport.image}, ${sport.id})}"></div>
                 <div class="sport-card-title">
-                    <h2 th:text="#{${'sport.' + sport.id}}">Sport</h2>
+                    <h2 th:text="${sport.getName(#locale.language)}">Sport</h2>
                     <span aria-hidden="true">→</span>
                 </div>
-                <small><th:block th:each="c, st : ${sport.categories}"><span th:text="#{${'category.' + c}}">Catégorie</span><th:block th:unless="${st.last}"> · </th:block></th:block></small>
+                <small><th:block th:each="t, st : ${typesBySport[sport.id]}"><span th:text="${t.getName(#locale.language)}">Catégorie</span><th:block th:unless="${st.last}"> · </th:block></th:block></small>
                 <small class="count" th:text="#{sports.articles(${articleCounts[sport.id] ?: 0})}">0 article</small>
             </a>
         </div>

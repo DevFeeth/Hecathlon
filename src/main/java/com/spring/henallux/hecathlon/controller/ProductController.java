@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 @RequestMapping("/produits")
 public class ProductController {
-
     private static final int RELATED_PRODUCTS = 4;
 
     private final ProductService productService;

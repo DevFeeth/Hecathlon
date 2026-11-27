@@ -1,18 +1,16 @@
 package com.spring.henallux.hecathlon.model;
 
+import com.spring.henallux.hecathlon.TestCatalog;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CartTest {
-
     private static Product product(String id, String price, String oldPrice) {
-        return new Product(id, id, "brand", "running", "shoes", "", "", 0, 0,
-                new BigDecimal(price), oldPrice == null ? null : new BigDecimal(oldPrice), false, null, List.of("M", "L"));
+        return TestCatalog.product(id, id, "running", TestCatalog.SHOES, price, oldPrice, "M", "L");
     }
 
     @Test
@@ -37,7 +35,7 @@ class CartTest {
         cart.setQuantity("shirt_M", 0);
         assertTrue(cart.isEmpty());
 
-        cart.setQuantity("unknown", 3); // ignored
+        cart.setQuantity("unknown", 3);
         assertTrue(cart.isEmpty());
     }
 

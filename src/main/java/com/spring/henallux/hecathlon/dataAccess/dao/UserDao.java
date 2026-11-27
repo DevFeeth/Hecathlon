@@ -14,7 +14,6 @@ import java.util.List;
 @Service
 @Transactional
 public class UserDao implements UserDataAccess{
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 

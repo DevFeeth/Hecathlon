@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/compte}" th:text="#{header.account}">Mon compte</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{account.menu.info}">Mes informations</span>
+        </nav>
+    </div>
+
+    <section class="container account">
+        <aside th:replace="~{fragments/account.html :: menu('info')}"></aside>
+
+        <div class="account-content">
+            <h1 th:text="#{account.menu.info}">Mes informations</h1>
+            <p class="muted" th:text="#{account.info.subtitle}">Gardez votre profil à jour.</p>
+
+            <p class="alert alert-success" th:if="${param.enregistre != null}" th:text="#{account.saved}">Modifications enregistrées.</p>
+            <p class="alert alert-success" th:if="${param.motdepasse != null}" th:text="#{account.passwordChanged}">Mot de passe modifié.</p>
+
+            <div class="account-forms">
+                <form class="form account-box" th:action="@{/compte/informations}" th:object="${profileForm}" method="post" novalidate>
+                    <h2 th:text="#{account.info.profile}">Mon profil</h2>
+                    <label>
+                        <span th:text="#{user.email}">Adresse e-mail</span>
+                        <input type="email" th:value="${account.email}" disabled>
+                        <small class="muted" th:text="#{account.info.emailFixed}">L'adresse e-mail sert d'identifiant.</small>
+                    </label>
+                    <div class="form-row">
+                        <label>
+                            <span th:text="#{user.firstName} + ' *'">Prénom *</span>
+                            <input type="text" th:field="*{firstName}" autocomplete="given-name">
+                            <small class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></small>
+                        </label>
+                        <label>
+                            <span th:text="#{user.lastName} + ' *'">Nom *</span>
+                            <input type="text" th:field="*{lastName}" autocomplete="family-name">
+                            <small class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></small>
+                        </label>
+                    </div>
+                    <label class="check">
+                        <input type="checkbox" th:field="*{newsletter}">
+                        <span th:text="#{inscription.newsletter}">Newsletter</span>
+                    </label>
+                    <button class="btn btn-primary" type="submit" th:text="#{account.save}">Enregistrer</button>
+                </form>
+
+                <form class="form account-box" th:action="@{/compte/mot-de-passe}" th:object="${passwordForm}" method="post" novalidate>
+                    <h2 th:text="#{account.info.password}">Mot de passe</h2>
+                    <label>
+                        <span th:text="#{account.info.currentPassword}">Mot de passe actuel</span>
+                        <input type="password" name="currentPassword" autocomplete="current-password">
+                        <small class="field-error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{account.info.newPassword}">Nouveau mot de passe</span>
+                        <input type="password" name="newPassword" autocomplete="new-password">
+                        <small class="muted" th:text="#{inscription.passwordHint}">8 caractères minimum, une majuscule et un chiffre.</small>
+                        <small class="field-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{account.info.confirmPassword}">Confirmer le nouveau mot de passe</span>
+                        <input type="password" name="confirmPassword" autocomplete="new-password">
+                        <small class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></small>
+                    </label>
+                    <button class="btn btn-primary" type="submit" th:text="#{account.info.changePassword}">Changer mon mot de passe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

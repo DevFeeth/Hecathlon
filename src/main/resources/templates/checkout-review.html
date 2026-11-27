@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content" th:with="d=${session.delivery}">
+
+    <div class="container page-head">
+        <ol th:replace="~{fragments/checkout.html :: steps(3)}"></ol>
+        <h1 th:text="#{checkout.review.title}">Vérifiez votre commande.</h1>
+        <p class="muted" th:text="#{checkout.review.subtitle}">Votre commande sera enregistrée, puis vous pourrez la payer.</p>
+    </div>
+
+    <section class="container cart">
+        <div class="checkout-form">
+            <div class="summary-box delivery-recap">
+                <svg th:replace="~{fragments/icons.html :: __${d.deliveryMode.name() == 'HOME' ? 'truck' : 'store'}__}"></svg>
+                <div>
+                    <strong>
+                        <th:block th:text="#{${'checkout.mode.' + d.deliveryMode}}">Livraison à domicile</th:block> ·
+                        <th:block th:if="${deliveryCost.signum() == 0}" th:text="#{cart.deliveryFree}">Offerte</th:block>
+                        <th:block th:unless="${deliveryCost.signum() == 0}" th:text="${#numbers.formatDecimal(deliveryCost, 1, 2, 'COMMA')} + ' €'">4,99 €</th:block>
+                    </strong>
+                    <p class="muted" th:if="${d.deliveryMode.name() == 'HOME'}"
+                       th:text="${d.firstName} + ' ' + ${d.lastName} + ' · ' + ${d.address} + ', ' + ${d.postalCode} + ' ' + ${d.city}">Adresse</p>
+                    <p class="muted" th:unless="${d.deliveryMode.name() == 'HOME'}"
+                       th:text="${d.firstName} + ' ' + ${d.lastName} + ' · ' + #{checkout.mode.STORE.info}">Magasin</p>
+                    <p class="muted" th:text="${d.email} + ' · ' + ${d.phone}">Contact</p>
+                </div>
+                <a class="link" th:href="@{/commande/livraison}" th:text="#{checkout.edit}">Modifier</a>
+            </div>
+
+            <h2 th:text="#{checkout.review.items(${cart.itemCount})}">Vos articles</h2>
+            <article class="cart-line order-line" th:each="line : ${cart.lines}" th:with="p=${line.product}">
+                <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
+                <div class="cart-line-info">
+                    <p class="kicker muted" th:text="${p.brand}">Marque</p>
+                    <h3 th:text="${p.name}">Produit</h3>
+                    <small class="muted" th:if="${line.size != null}" th:text="#{cart.size(${line.size})}">Taille M</small>
+                    <small class="muted" th:text="#{cart.unitPrice(${#numbers.formatDecimal(p.price, 1, 2, 'COMMA')})}">Prix unitaire</small>
+                    <small th:text="#{checkout.qty(${line.quantity})}">Qté : 1</small>
+                </div>
+                <p class="cart-line-total" th:text="${#numbers.formatDecimal(line.total, 1, 2, 'COMMA')} + ' €'">0,00 €</p>
+            </article>
+
+            <form class="form" th:action="@{/commande/recapitulatif}" method="post">
+                <label class="check">
+                    <input type="checkbox" name="acceptTerms" value="true">
+                    <span th:text="#{checkout.terms}">J'accepte les conditions générales de vente.</span>
+                </label>
+                <small class="field-error" th:if="${termsError}" th:text="#{checkout.terms.required}">Veuillez accepter les CGV.</small>
+                <button class="btn btn-primary btn-block" type="submit"
+                        th:text="#{checkout.confirm(${#numbers.formatDecimal(total, 1, 2, 'COMMA')})}">Confirmer ma commande</button>
+                <a class="link" th:href="@{/commande/livraison}" th:text="'← ' + #{checkout.editDelivery}">← Modifier la livraison</a>
+            </form>
+        </div>
+
+        <aside th:replace="~{fragments/checkout.html :: summary}"></aside>
+    </section>
+
+</main>
+</body>
+</html>

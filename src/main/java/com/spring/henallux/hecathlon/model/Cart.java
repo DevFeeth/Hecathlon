@@ -6,15 +6,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Shopping cart kept in the HTTP session (see Constants.CART). Prices include VAT. */
 public class Cart {
-
     public static final int MAX_QUANTITY = 10;
     public static final BigDecimal FREE_DELIVERY_FROM = new BigDecimal("79.00");
     public static final BigDecimal DELIVERY_COST = new BigDecimal("4.99");
-    public static final BigDecimal VAT_RATE = new BigDecimal("0.21"); // Belgium
+    public static final BigDecimal VAT_RATE = new BigDecimal("0.21");
 
-    // one line per product + size, in the order they were added
     private final Map<String, CartLine> lines = new LinkedHashMap<>();
 
     public void add(Product product, String size, int quantity) {
@@ -23,7 +20,6 @@ public class Cart {
         line.setQuantity(Math.min(line.getQuantity() + quantity, MAX_QUANTITY));
     }
 
-    /** A quantity of 0 or less removes the line; unknown keys are ignored. */
     public void setQuantity(String key, int quantity) {
         CartLine line = lines.get(key);
         if (line == null) {
@@ -56,7 +52,6 @@ public class Cart {
         return isEmpty() || getSubtotal().compareTo(FREE_DELIVERY_FROM) >= 0 ? BigDecimal.ZERO : DELIVERY_COST;
     }
 
-    /** What is still missing to get free delivery (0 when it is already free). */
     public BigDecimal getMissingForFreeDelivery() {
         return FREE_DELIVERY_FROM.subtract(getSubtotal()).max(BigDecimal.ZERO);
     }
@@ -65,13 +60,14 @@ public class Cart {
         return getSubtotal().add(getDeliveryCost());
     }
 
-    /** VAT included in the total: total - total / (1 + rate). */
     public BigDecimal getVat() {
-        BigDecimal total = getTotal();
+        return vatIncluded(getTotal());
+    }
+
+    public static BigDecimal vatIncluded(BigDecimal total) {
         return total.subtract(total.divide(BigDecimal.ONE.add(VAT_RATE), 2, RoundingMode.HALF_UP));
     }
 
-    /** Sum of the discounts on the lines (old price - price). */
     public BigDecimal getSavings() {
         return lines.values().stream()
                 .filter(line -> line.getProduct().getOldPrice() != null)
