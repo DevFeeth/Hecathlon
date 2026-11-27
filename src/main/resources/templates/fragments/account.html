@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside th:fragment="menu(active)" class="account-menu">
+    <div class="account-hello">
+        <p class="account-hello-name" th:text="#{account.hello(${account.firstName})}">Bonjour</p>
+        <small class="muted" th:if="${account.createdAt != null}"
+               th:text="#{account.memberSince(${#temporals.format(account.createdAt, 'MMMM yyyy')})}">Membre depuis</small>
+    </div>
+    <nav th:attr="aria-label=#{header.account}">
+        <a th:each="item : ${ {overview: '', orders: '/commandes', info: '/informations', addresses: '/adresses'} }"
+           th:href="@{'/compte' + ${item.value}}"
+           th:classappend="${item.key == active} ? 'active'"
+           th:attrappend="aria-current=${item.key == active} ? 'page'"
+           th:text="#{${'account.menu.' + item.key}}">Menu</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" th:text="#{header.logout}">Déconnexion</button>
+        </form>
+    </nav>
+</aside>
+
+<div th:fragment="figures" class="account-figures">
+    <a th:href="@{/compte/commandes}">
+        <svg th:replace="~{fragments/icons.html :: package}"></svg>
+        <span><strong th:text="${ordersThisYear}">0</strong><small th:text="#{account.figure.orders}">Commandes cette année</small></span>
+    </a>
+    <a th:href="@{/compte/commandes(filtre='en-cours')}">
+        <svg th:replace="~{fragments/icons.html :: truck}"></svg>
+        <span><strong th:text="${inProgressCount}">0</strong><small th:text="#{account.figure.inProgress}">Commandes en cours</small></span>
+    </a>
+    <a th:href="@{/compte/commandes(filtre='livrees')}">
+        <svg th:replace="~{fragments/icons.html :: bag}"></svg>
+        <span><strong th:text="${deliveredCount}">0</strong><small th:text="#{account.figure.delivered}">Commandes livrées</small></span>
+    </a>
+</div>
+
+<article th:fragment="orderCard(o)" class="order-card" th:with="mode=${o.deliveryMode.name()}">
+    <header class="order-card-head">
+        <div>
+            <strong th:text="#{account.orderNumber(${o.number})}">Commande n°</strong>
+            <small class="muted" th:text="#{account.orderPlaced(${#temporals.format(o.date, 'd MMMM yyyy')}, ${o.itemCount})}">Passée le</small>
+        </div>
+        <span class="status" th:classappend="'status-' + ${o.status}" th:text="#{${'order.status.' + mode + '.' + o.status}}">Statut</span>
+        <strong class="order-card-total" th:text="${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+    </header>
+    <div class="order-card-body">
+        <div class="media"><img th:src="@{${o.lines[0].image}}" alt=""></div>
+        <div class="order-card-info">
+            <p class="order-card-title">
+                <th:block th:each="line, st : ${o.lines}" th:if="${st.index < 3}"><th:block th:text="${line.productName}">Produit</th:block><th:block th:unless="${st.last or st.index == 2}">, </th:block></th:block><th:block th:if="${o.lines.size() > 3}" th:text="' ' + #{account.andMore(${o.lines.size() - 3})}"></th:block>
+            </p>
+            <small class="accent" th:unless="${o.status.paid}" th:text="#{account.awaitingPayment}">En attente de paiement</small>
+            <small class="accent" th:if="${o.status.paid and o.status.inProgress}"
+                   th:text="#{${'account.expected.' + mode}(${#temporals.format(o.expectedDeliveryDate, 'd MMMM')})}">Livraison prévue le</small>
+            <small class="free" th:unless="${o.status.inProgress}"
+                   th:text="#{${'account.done.' + mode}(${#temporals.format(o.statusDate ?: o.date, 'd MMMM')})}">Livrée le</small>
+            <small class="muted" th:text="#{${'checkout.mode.' + mode}} + ' · ' + ${o.firstName} + ' ' + ${o.lastName}">Mode · Nom</small>
+        </div>
+        <a class="btn btn-primary" th:unless="${o.status.paid}" th:href="@{/commande/{id}/paiement(id=${o.id})}" th:text="#{account.pay}">Payer</a>
+        <a class="btn btn-outline" th:if="${o.status.paid}" th:href="@{/compte/commandes/{id}(id=${o.id})}"
+           th:text="${o.status.inProgress} ? #{account.track} : #{account.details}">Voir le détail</a>
+    </div>
+</article>
+
+<div th:fragment="bottomBoxes" class="account-boxes">
+    <div class="account-box account-box-wide">
+        <h3 th:text="#{account.mainAddress}">Mon adresse principale</h3>
+        <p class="muted" th:if="${account.hasAddress()}">
+            <th:block th:text="${account.firstName} + ' ' + ${account.lastName}">Nom</th:block><br>
+            <th:block th:text="${account.address}">Rue</th:block><br>
+            <th:block th:if="${account.addressComplement != null}"><th:block th:text="${account.addressComplement}"></th:block><br></th:block>
+            <th:block th:text="${account.postalCode} + ' ' + ${account.city} + ', ' + ${account.country}">Ville</th:block><br>
+            <th:block th:text="${account.phone}">Téléphone</th:block>
+        </p>
+        <p class="muted" th:unless="${account.hasAddress()}" th:text="#{account.noAddress}">Aucune adresse enregistrée.</p>
+        <a class="link" th:href="@{/compte/adresses}" th:text="#{account.manageAddress} + ' →'">Gérer mes adresses →</a>
+    </div>
+</div>
+
+</body>
+</html>

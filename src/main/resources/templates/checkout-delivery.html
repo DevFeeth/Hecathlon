@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <ol th:replace="~{fragments/checkout.html :: steps(2)}"></ol>
+        <h1 th:text="#{checkout.delivery.title}">Où souhaitez-vous recevoir votre élan ?</h1>
+    </div>
+
+    <section class="container cart">
+        <form class="checkout-form form" th:action="@{/commande/livraison}" th:object="${deliveryForm}" method="post" novalidate>
+
+            <div class="alert checkout-hello">
+                <svg th:replace="~{fragments/icons.html :: user}"></svg>
+                <div>
+                    <strong th:text="#{checkout.hello(${#authentication.principal.firstName})}">Bonjour, ravis de vous retrouver.</strong>
+                    <small class="muted" th:text="${#authentication.principal.username} + ' · ' + #{checkout.prefilled}">email · Vos informations sont préremplies.</small>
+                </div>
+            </div>
+
+            <h2 th:text="#{checkout.contact}">1. Vos coordonnées</h2>
+            <div class="form-row">
+                <label>
+                    <span th:text="#{user.firstName} + ' *'">Prénom *</span>
+                    <input type="text" th:field="*{firstName}" autocomplete="given-name">
+                    <small class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></small>
+                </label>
+                <label>
+                    <span th:text="#{user.lastName} + ' *'">Nom *</span>
+                    <input type="text" th:field="*{lastName}" autocomplete="family-name">
+                    <small class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></small>
+                </label>
+            </div>
+            <div class="form-row">
+                <label>
+                    <span th:text="#{user.email} + ' *'">E-mail *</span>
+                    <input type="email" th:field="*{email}" autocomplete="email">
+                    <small class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                </label>
+                <label>
+                    <span th:text="#{checkout.phone} + ' *'">Téléphone mobile *</span>
+                    <input type="tel" th:field="*{phone}" autocomplete="tel" placeholder="0470 12 34 56">
+                    <small class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
+                </label>
+            </div>
+            <small class="muted" th:text="#{checkout.phoneUse}">Votre numéro sert uniquement au suivi de la livraison.</small>
+
+            <h2 th:text="#{checkout.mode}">2. Votre mode de livraison</h2>
+            <div class="choices">
+                <label class="choice">
+                    <input type="radio" th:field="*{deliveryMode}" value="HOME">
+                    <span class="choice-text">
+                        <strong th:text="#{checkout.mode.HOME}">Livraison à domicile</strong>
+                        <small class="muted" th:text="#{checkout.mode.HOME.info}">Sous 2 à 4 jours ouvrés</small>
+                    </span>
+                    <strong th:if="${homeDeliveryCost.signum() == 0}" class="free" th:text="#{cart.deliveryFree}">Offerte</strong>
+                    <strong th:unless="${homeDeliveryCost.signum() == 0}" th:text="${#numbers.formatDecimal(homeDeliveryCost, 1, 2, 'COMMA')} + ' €'">4,99 €</strong>
+                </label>
+                <label class="choice">
+                    <input type="radio" th:field="*{deliveryMode}" value="STORE">
+                    <span class="choice-text">
+                        <strong th:text="#{checkout.mode.STORE}">Retrait en magasin</strong>
+                        <small class="muted" th:text="#{checkout.mode.STORE.info}">Prêt en 2 h · Hecathlon Namur</small>
+                    </span>
+                    <strong th:text="#{checkout.free}">Gratuit</strong>
+                </label>
+            </div>
+
+            <div class="address-fields">
+                <h2 th:text="#{checkout.address}">3. Votre adresse</h2>
+                <label>
+                    <span th:text="#{checkout.street} + ' *'">Adresse *</span>
+                    <input type="text" th:field="*{address}" autocomplete="street-address">
+                    <small class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></small>
+                </label>
+                <label>
+                    <span th:text="#{checkout.complement}">Complément d'adresse</span>
+                    <input type="text" th:field="*{addressComplement}" th:placeholder="#{checkout.complement.hint}">
+                    <small class="field-error" th:if="${#fields.hasErrors('addressComplement')}" th:errors="*{addressComplement}"></small>
+                </label>
+                <div class="form-row">
+                    <label>
+                        <span th:text="#{checkout.postalCode} + ' *'">Code postal *</span>
+                        <input type="text" th:field="*{postalCode}" autocomplete="postal-code">
+                        <small class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{checkout.city} + ' *'">Ville *</span>
+                        <input type="text" th:field="*{city}" autocomplete="address-level2">
+                        <small class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></small>
+                    </label>
+                </div>
+                <label>
+                    <span th:text="#{checkout.country} + ' *'">Pays *</span>
+                    <select th:field="*{country}">
+                        <option th:each="c : ${countries}" th:value="${c}" th:text="${c}">Belgique</option>
+                    </select>
+                    <small class="field-error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></small>
+                </label>
+            </div>
+
+            <div class="checkout-actions">
+                <a class="link" th:href="@{/panier}" th:text="'← ' + #{checkout.backToCart}">← Retour au panier</a>
+                <button class="btn btn-primary" type="submit" th:text="#{checkout.toPayment} + ' →'">Continuer vers le paiement →</button>
+            </div>
+            <small class="muted" th:text="#{checkout.required}">* Champs obligatoires.</small>
+        </form>
+
+        <aside th:replace="~{fragments/checkout.html :: summary}"></aside>
+    </section>
+
+</main>
+</body>
+</html>

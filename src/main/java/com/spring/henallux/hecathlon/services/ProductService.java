@@ -1,40 +1,67 @@
 package com.spring.henallux.hecathlon.services;
 
+import com.spring.henallux.hecathlon.dataAccess.dao.ProductDataAccess;
 import com.spring.henallux.hecathlon.model.Product;
+import com.spring.henallux.hecathlon.model.ProductSort;
+import com.spring.henallux.hecathlon.model.ProductType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-// shortcut: hardcoded catalogue, move to an entity/repository/DAO when products are stored in the database
 @Service
 public class ProductService {
+    public static final int PAGE_SIZE = 9;
 
-    private static final Product PACE_500 = new Product("pace-500", "Chaussures running homme Pace 500", "Élan Running",
-            "running", "Amorti confort · 3 couleurs", 4.7, 248, new BigDecimal("89.99"), new BigDecimal("109.99"), false, null);
+    private final ProductDataAccess productDataAccess;
 
-    private final List<Product> featuredProducts = List.of(
-            PACE_500,
-            new Product("strike-900", "Chaussures de football Strike 900 FG", "Élan Football",
-                    "football", "Terrain sec · 2 couleurs", 4.6, 186, new BigDecimal("69.99"), null, true, null),
-            new Product("match-500", "Ballon de football Match 500 taille 5", "Élan Football",
-                    "football", "Cousu machine · Taille 5", 4.8, 94, new BigDecimal("24.99"), new BigDecimal("29.99"), false, null),
-            new Product("aero-700", "Casque vélo route Aero 700", "Élan Vélo",
-                    "cycling", "Ventilé · 3 tailles", 4.6, 75, new BigDecimal("79.99"), new BigDecimal("99.99"), false, null)
-    );
-
-    private final List<Product> highlightedProducts = List.of(
-            PACE_500,
-            new Product("rain-500", "Veste de pluie vélo Rain 500", "Élan Vélo",
-                    "cycling", "Imperméable · Respirante", 4.5, 112, new BigDecimal("59.99"), null, false, null)
-    );
+    @Autowired
+    public ProductService(ProductDataAccess productDataAccess) {
+        this.productDataAccess = productDataAccess;
+    }
 
     public List<Product> getFeaturedProducts() {
-        return featuredProducts;
+        return productDataAccess.findFeatured();
     }
 
     public List<Product> getHighlightedProducts() {
-        return highlightedProducts;
+        return productDataAccess.findHighlighted();
     }
 
+    public Optional<Product> findById(String id) {
+        return Optional.ofNullable(productDataAccess.findById(id));
+    }
+
+    public List<Product> findRelated(Product product, int max) {
+        return productDataAccess.findOthersOfSport(product.getSportId(), List.of(product.getId()), max);
+    }
+
+    public List<Product> findSuggestions(String sportId, Collection<String> excludedIds, int max) {
+        return productDataAccess.findOthersOfSport(sportId, excludedIds, max);
+    }
+
+    public Map<String, Long> countBySport() {
+        return productDataAccess.countBySport();
+    }
+
+    public List<ProductType> findTypesBySport(String sportId) {
+        return productDataAccess.findTypesOfSport(sportId);
+    }
+
+    public Page<Product> findBySport(String sportId, String typeId, boolean onSaleOnly, BigDecimal maxPrice,
+                                     ProductSort sort, int page) {
+        Page<Product> result = productDataAccess.search(sportId, typeId, onSaleOnly, maxPrice,
+                PageRequest.of(Math.max(page, 0), PAGE_SIZE, sort.getSort()));
+        if (result.getTotalPages() > 0 && result.getNumber() >= result.getTotalPages()) {
+            result = productDataAccess.search(sportId, typeId, onSaleOnly, maxPrice,
+                    PageRequest.of(result.getTotalPages() - 1, PAGE_SIZE, sort.getSort()));
+        }
+        return result;
+    }
 }

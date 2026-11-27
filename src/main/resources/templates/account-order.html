@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content" th:with="o=${order}, mode=${order.deliveryMode.name()}, home=${order.deliveryMode.name() == 'HOME'}">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/compte}" th:text="#{header.account}">Mon compte</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/compte/commandes}" th:text="#{account.menu.orders}">Mes commandes</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="${o.number}">HC000001</span>
+        </nav>
+    </div>
+
+    <section class="container account">
+        <aside th:replace="~{fragments/account.html :: menu('orders')}"></aside>
+
+        <div class="account-content">
+            <a class="link" th:href="@{/compte/commandes}" th:text="'← ' + #{account.allOrders}">← Toutes mes commandes</a>
+            <h1 th:text="#{account.orderNumber(${o.number})}">Commande n°</h1>
+            <p class="muted"
+               th:text="#{account.orderPlaced(${#temporals.format(o.date, 'd MMMM yyyy')}, ${o.itemCount})} + ' · ' + ${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')} + ' €'">Passée le</p>
+
+            <div class="tracking">
+                <div class="tracking-head">
+                    <svg th:replace="~{fragments/icons.html :: __${home ? 'truck' : 'store'}__}"></svg>
+                    <div>
+                        <p class="kicker accent" th:text="#{${'order.status.' + mode + '.' + o.status}}">Statut</p>
+                        <h2 th:unless="${o.status.paid}" th:text="#{account.tracking.pending}">Votre commande attend son paiement.</h2>
+                        <h2 th:if="${o.status.paid and o.status.inProgress}"
+                            th:text="#{${'account.tracking.coming.' + mode}(${#temporals.format(o.expectedDeliveryDate, 'EEEE d MMMM')})}">Votre équipement arrive bientôt.</h2>
+                        <h2 th:unless="${o.status.inProgress}"
+                            th:text="#{${'account.tracking.done.' + mode}(${#temporals.format(o.statusDate ?: o.date, 'EEEE d MMMM')})}">Commande livrée.</h2>
+                    </div>
+                </div>
+                <form th:unless="${o.status.paid}" th:action="@{/commande/{id}/paiement(id=${o.id})}" method="post">
+                    <button class="btn btn-primary" type="submit" th:text="#{checkout.pay(${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')})}">Payer</button>
+                </form>
+                <ol class="order-progress" th:if="${o.status.paid}">
+                    <li th:each="s : ${statuses}"
+                        th:classappend="${s.step <= o.status.step} ? 'done'"
+                        th:attrappend="aria-current=${s == o.status} ? 'step'">
+                        <span th:text="${s.step <= o.status.step} ? '✓' : ${s.step}">1</span>
+                        <th:block th:text="#{${'order.status.' + mode + '.' + s}}">Étape</th:block>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="order-boxes">
+                <div>
+                    <h3 th:text="${home} ? #{checkout.deliveryAddress} : #{checkout.mode.STORE}">Adresse de livraison</h3>
+                    <p class="muted">
+                        <th:block th:text="${o.firstName} + ' ' + ${o.lastName}">Nom</th:block><br>
+                        <th:block th:if="${home}">
+                            <th:block th:text="${o.address}">Rue</th:block><br>
+                            <th:block th:if="${o.addressComplement != null and !o.addressComplement.isBlank()}"><th:block th:text="${o.addressComplement}"></th:block><br></th:block>
+                            <th:block th:text="${o.postalCode} + ' ' + ${o.city} + ', ' + ${o.country}">Ville</th:block><br>
+                        </th:block>
+                        <th:block th:unless="${home}"><th:block th:text="#{checkout.mode.STORE.info}">Magasin</th:block><br></th:block>
+                        <th:block th:text="${o.phone}">Téléphone</th:block>
+                    </p>
+                </div>
+                <div>
+                    <h3 th:text="#{${'checkout.mode.' + mode}}">Livraison à domicile</h3>
+                    <p class="muted" th:text="#{${'account.modeInfo.' + mode}}">Remise en boîte aux lettres.</p>
+                </div>
+            </div>
+
+            <h2 th:text="#{account.inParcel}">Dans votre colis</h2>
+            <article class="cart-line order-line" th:each="line : ${o.lines}">
+                <a th:href="@{/produits/{id}(id=${line.productId})}">
+                    <div class="media"><img th:src="@{${line.image}}" alt=""></div>
+                </a>
+                <div class="cart-line-info">
+                    <p class="kicker muted" th:text="${line.brand}">Marque</p>
+                    <h3><a th:href="@{/produits/{id}(id=${line.productId})}" th:text="${line.productName}">Produit</a></h3>
+                    <small class="muted" th:if="${line.size != null}" th:text="#{cart.size(${line.size})}">Taille M</small>
+                    <small th:text="#{checkout.qty(${line.quantity})}">Qté : 1</small>
+                </div>
+                <p class="cart-line-total" th:text="${#numbers.formatDecimal(line.total, 1, 2, 'COMMA')} + ' €'">0,00 €</p>
+            </article>
+
+            <div class="account-boxes">
+                <div class="account-box">
+                    <h3 th:text="#{account.payment}">Paiement</h3>
+                    <p>PayPal</p>
+                    <p class="free" th:if="${o.status.paid}" th:text="#{account.paidOn(${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')}, ${#temporals.format(o.paidAt ?: o.date, 'd MMMM yyyy')})}">Paiement accepté</p>
+                    <p class="accent" th:unless="${o.status.paid}" th:text="#{account.awaitingPayment}">En attente de paiement</p>
+                    <hr>
+                    <h3 th:text="#{account.returns.title}">Un article ne vous convient pas ?</h3>
+                    <p class="muted" th:text="#{account.returns.text}">Retour gratuit pendant 30 jours.</p>
+                </div>
+                <div class="summary-box">
+                    <h2 th:text="#{cart.summary}">Votre commande</h2>
+                    <dl>
+                        <dt th:text="#{cart.subtotal(${o.itemCount})}">Sous-total</dt>
+                        <dd th:text="${#numbers.formatDecimal(o.subtotal, 1, 2, 'COMMA')} + ' €'">0,00 €</dd>
+                        <dt th:text="#{checkout.deliveryCost}">Livraison</dt>
+                        <dd th:if="${o.deliveryCost.signum() == 0}" class="free" th:text="#{cart.deliveryFree}">Offerte</dd>
+                        <dd th:unless="${o.deliveryCost.signum() == 0}" th:text="${#numbers.formatDecimal(o.deliveryCost, 1, 2, 'COMMA')} + ' €'">4,99 €</dd>
+                    </dl>
+                    <div class="summary-total">
+                        <span th:text="#{cart.total}">Total TTC</span>
+                        <strong th:text="${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+                    </div>
+                    <small class="muted" th:text="#{cart.vat(${#numbers.formatDecimal(o.vat, 1, 2, 'COMMA')})}">Dont TVA</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

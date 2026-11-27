@@ -8,9 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class UserDetailsServiceImplementation implements UserDetailsService {
-
     private final UserDataAccess userDAO;
 
     @Autowired
@@ -20,7 +21,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDAO.findByUsername(username);
+        User user = userDAO.findByEmail(username.trim().toLowerCase(Locale.ROOT));
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

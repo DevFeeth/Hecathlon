@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/compte}" th:text="#{header.account}">Mon compte</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{account.menu.addresses}">Mes adresses</span>
+        </nav>
+    </div>
+
+    <section class="container account">
+        <aside th:replace="~{fragments/account.html :: menu('addresses')}"></aside>
+
+        <div class="account-content">
+            <h1 th:text="#{account.menu.addresses}">Mes adresses</h1>
+            <p class="muted" th:text="#{account.address.subtitle}">Votre adresse principale préremplit vos prochaines commandes.</p>
+
+            <p class="alert alert-success" th:if="${param.enregistre != null}" th:text="#{account.saved}">Modifications enregistrées.</p>
+
+            <form class="form account-box" th:action="@{/compte/adresses}" th:object="${addressForm}" method="post" novalidate>
+                <h2 th:text="#{account.mainAddress}">Mon adresse principale</h2>
+                <p class="muted" th:text="${account.firstName} + ' ' + ${account.lastName}">Nom</p>
+                <label>
+                    <span th:text="#{checkout.phone} + ' *'">Téléphone mobile *</span>
+                    <input type="tel" th:field="*{phone}" autocomplete="tel" placeholder="0470 12 34 56">
+                    <small class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
+                </label>
+                <label>
+                    <span th:text="#{checkout.street} + ' *'">Adresse *</span>
+                    <input type="text" th:field="*{address}" autocomplete="street-address">
+                    <small class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></small>
+                </label>
+                <label>
+                    <span th:text="#{checkout.complement}">Complément d'adresse</span>
+                    <input type="text" th:field="*{addressComplement}" th:placeholder="#{checkout.complement.hint}">
+                    <small class="field-error" th:if="${#fields.hasErrors('addressComplement')}" th:errors="*{addressComplement}"></small>
+                </label>
+                <div class="form-row">
+                    <label>
+                        <span th:text="#{checkout.postalCode} + ' *'">Code postal *</span>
+                        <input type="text" th:field="*{postalCode}" autocomplete="postal-code">
+                        <small class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{checkout.city} + ' *'">Ville *</span>
+                        <input type="text" th:field="*{city}" autocomplete="address-level2">
+                        <small class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></small>
+                    </label>
+                </div>
+                <label>
+                    <span th:text="#{checkout.country} + ' *'">Pays *</span>
+                    <select th:field="*{country}">
+                        <option th:each="c : ${countries}" th:value="${c}" th:text="${c}">Belgique</option>
+                    </select>
+                    <small class="field-error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></small>
+                </label>
+                <button class="btn btn-primary" type="submit" th:text="#{account.save}">Enregistrer</button>
+            </form>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

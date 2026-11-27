@@ -15,7 +15,18 @@ spring:
     username: myuser
     password: secret
     driverClassName: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     show-sql: true
+
+hecathlon:
+  paypal:
+    base-url: https://api-m.sandbox.paypal.com
+    client-id: ${PAYPAL_CLIENT_ID:}
+    client-secret: ${PAYPAL_CLIENT_SECRET:}
+  remember-me-key: ${REMEMBER_ME_KEY:6e8bec763786951bfd899e92803c30a8708dc5c44f51fcc775bfcb6a1248c781}

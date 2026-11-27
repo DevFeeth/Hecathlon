@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <div class="container page-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{header.account}">Mon compte</span>
+        </nav>
+    </div>
+
+    <section class="container account">
+        <aside th:replace="~{fragments/account.html :: menu('overview')}"></aside>
+
+        <div class="account-content">
+            <h1 th:text="#{account.overview.title}">Vue d'ensemble</h1>
+            <p class="muted" th:text="#{account.overview.subtitle}">Tout votre espace Hecathlon en un coup d'œil.</p>
+
+            <div th:replace="~{fragments/account.html :: figures}"></div>
+
+            <div class="section-head">
+                <h2 th:text="#{account.lastOrder}">Ma dernière commande</h2>
+                <a class="link" th:unless="${orders.empty}" th:href="@{/compte/commandes}" th:text="#{account.allOrders} + ' →'">Toutes mes commandes →</a>
+            </div>
+            <th:block th:unless="${orders.empty}">
+                <article th:replace="~{fragments/account.html :: orderCard(${orders[0]})}"></article>
+            </th:block>
+            <div class="account-empty" th:if="${orders.empty}">
+                <p th:text="#{account.noOrder}">Vous n'avez pas encore passé de commande.</p>
+                <a class="btn btn-primary" th:href="@{/sports}" th:text="#{cart.emptyCta}">Découvrir nos sports</a>
+            </div>
+
+            <div th:replace="~{fragments/account.html :: bottomBoxes}"></div>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content" th:with="o=${order}">
+
+    <div class="container page-head">
+        <ol th:replace="~{fragments/checkout.html :: steps(4)}"></ol>
+        <h1 th:text="#{checkout.payment.title}">Plus qu'une étape avant de bouger.</h1>
+        <p class="muted" th:text="#{checkout.payment.subtitle(${o.number})}">Votre commande est enregistrée.</p>
+    </div>
+
+    <section class="container cart">
+        <div class="checkout-form">
+            <p class="alert alert-success" th:text="#{checkout.payment.saved(${o.number})}">Commande enregistrée.</p>
+            <p class="alert alert-error" th:if="${param.annule != null}" th:text="#{checkout.payment.cancelled}">Paiement annulé.</p>
+            <p class="alert alert-error" th:if="${param.echec != null}" th:text="#{checkout.payment.failed}">Paiement refusé.</p>
+            <p class="alert alert-error" th:if="${param.indisponible != null}" th:text="#{checkout.payment.unavailable}">PayPal indisponible.</p>
+
+            <h2 th:text="#{checkout.paymentMethod}">Votre moyen de paiement</h2>
+            <div class="choice paypal-choice">
+                <span class="choice-text">
+                    <strong>PayPal</strong>
+                    <small class="muted" th:text="#{checkout.method.PAYPAL.info}">Payez avec votre compte PayPal ou par carte.</small>
+                </span>
+                <strong class="payment-brands">PayPal</strong>
+            </div>
+            <p class="alert simulated">
+                <svg th:replace="~{fragments/icons.html :: lock}"></svg>
+                <span th:text="#{checkout.payment.secure}">Vous allez être redirigé vers PayPal.</span>
+            </p>
+
+            <form th:action="@{/commande/{id}/paiement(id=${o.id})}" method="post">
+                <button class="btn btn-primary btn-block" type="submit"
+                        th:text="#{checkout.pay(${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')})}">Payer avec PayPal</button>
+            </form>
+            <a class="link" th:href="@{/compte/commandes/{id}(id=${o.id})}" th:text="#{checkout.payment.later}">Payer plus tard</a>
+        </div>
+
+        <aside class="cart-summary">
+            <div class="summary-box">
+                <h2 th:text="#{account.orderNumber(${o.number})}">Commande</h2>
+                <ul class="summary-lines">
+                    <li th:each="line : ${o.lines}">
+                        <div class="media"><img th:src="@{${line.image}}" alt=""></div>
+                        <div>
+                            <p class="kicker muted" th:text="${line.brand}">Marque</p>
+                            <p class="summary-line-name" th:text="${line.productName}">Produit</p>
+                            <small class="muted" th:if="${line.size != null}" th:text="#{cart.size(${line.size})}">Taille M</small>
+                            <p class="summary-line-qty">
+                                <small th:text="#{checkout.qty(${line.quantity})}">Qté : 1</small>
+                                <strong th:text="${#numbers.formatDecimal(line.total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+                <dl>
+                    <dt th:text="#{cart.subtotal(${o.itemCount})}">Sous-total</dt>
+                    <dd th:text="${#numbers.formatDecimal(o.subtotal, 1, 2, 'COMMA')} + ' €'">0,00 €</dd>
+                    <dt th:text="#{checkout.deliveryCost}">Livraison</dt>
+                    <dd th:if="${o.deliveryCost.signum() == 0}" class="free" th:text="#{cart.deliveryFree}">Offerte</dd>
+                    <dd th:unless="${o.deliveryCost.signum() == 0}" th:text="${#numbers.formatDecimal(o.deliveryCost, 1, 2, 'COMMA')} + ' €'">4,99 €</dd>
+                </dl>
+                <div class="summary-total">
+                    <span th:text="#{cart.total}">Total TTC</span>
+                    <strong th:text="${#numbers.formatDecimal(o.total, 1, 2, 'COMMA')} + ' €'">0,00 €</strong>
+                </div>
+                <small class="muted" th:text="#{cart.vat(${#numbers.formatDecimal(o.vat, 1, 2, 'COMMA')})}">Dont TVA</small>
+            </div>
+        </aside>
+    </section>
+
+</main>
+</body>
+</html>

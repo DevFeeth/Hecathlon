@@ -14,7 +14,6 @@ import java.util.List;
 @Service
 @Transactional
 public class UserDao implements UserDataAccess{
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -32,8 +31,8 @@ public class UserDao implements UserDataAccess{
     }
 
     @Override
-    public User findByUsername(String username) {
-        UserEntity entity = userRepository.findByUsername(username);
+    public User findByEmail(String email) {
+        UserEntity entity = userRepository.findByEmail(email);
         return entity != null ? userMapper.userEntityToUserModel(entity) : null;
     }
 

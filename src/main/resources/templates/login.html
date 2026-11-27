@@ -9,28 +9,135 @@
     <title></title>
 </head>
 <body>
-<main layout:fragment="main-content" class="container auth">
-    <h1 th:text="#{login.title}">Connexion</h1>
+<main layout:fragment="main-content">
 
-    <p class="alert alert-success" th:if="${param.registered != null}" th:text="#{login.registered}">Compte créé.</p>
-    <p class="alert alert-error" th:if="${param.error != null}" th:text="#{login.error}">Identifiants incorrects.</p>
+    <div class="container page-head auth-head">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a th:href="@{/}" th:text="#{breadcrumb.home}">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" th:text="#{header.account}">Mon compte</span>
+        </nav>
+        <h1 th:text="#{login.title}">Votre sport. Votre espace.</h1>
+        <p class="muted" th:text="#{login.subtitle}">Connectez-vous ou rejoignez la communauté Hecathlon.</p>
+    </div>
 
-    <form class="form" th:action="@{/login}" method="post">
-        <label>
-            <span th:text="#{user.username}">Nom d'utilisateur</span>
-            <input type="text" name="username" autocomplete="username" required autofocus>
-        </label>
-        <label>
-            <span th:text="#{user.password}">Mot de passe</span>
-            <input type="password" name="password" autocomplete="current-password" required>
-        </label>
-        <button class="btn btn-primary" type="submit" th:text="#{login.submit}">Se connecter</button>
-    </form>
+    <section class="container auth-grid">
 
-    <p class="auth-switch">
-        <span th:text="#{login.noAccount}">Pas encore de compte ?</span>
-        <a class="link" th:href="@{/inscription}" th:text="#{inscription.title}">Créer un compte</a>
-    </p>
+        <div class="auth-card">
+            <h2 th:text="#{login.heading}">Déjà dans l'équipe ?</h2>
+            <p class="muted" th:text="#{login.text}">Retrouvez vos commandes.</p>
+
+            <p class="alert alert-success" th:if="${param.registered != null}" th:text="#{login.registered}">Compte créé.</p>
+            <p class="alert alert-error" th:if="${param.error != null}" th:text="#{login.error}">Identifiants incorrects.</p>
+
+            <form class="form" th:action="@{/login}" method="post">
+                <label>
+                    <span th:text="#{user.email}">Adresse e-mail</span>
+                    <input type="email" name="email" autocomplete="email" required>
+                </label>
+                <label>
+                    <span th:text="#{user.password}">Mot de passe</span>
+                    <input type="password" name="password" autocomplete="current-password" required>
+                </label>
+                <label class="check">
+                    <input type="checkbox" name="remember-me">
+                    <span th:text="#{login.remember}">Rester connecté</span>
+                </label>
+                <button class="btn btn-primary btn-block" type="submit" th:text="#{login.submit}">Me connecter</button>
+            </form>
+            <small class="muted" th:text="#{login.privacy}">Vos données restent confidentielles.</small>
+        </div>
+
+        <div class="auth-card auth-card-alt" id="inscription">
+            <h2 th:text="#{inscription.heading}">Premier élan ? Rejoignez-nous.</h2>
+            <p class="muted" th:text="#{inscription.text}">Un compte gratuit.</p>
+
+            <form class="form" th:action="@{/inscription}" th:object="${registrationForm}" method="post" novalidate>
+                <div class="form-row">
+                    <label>
+                        <span th:text="#{user.firstName} + ' *'">Prénom *</span>
+                        <input type="text" th:field="*{firstName}" autocomplete="given-name">
+                        <small class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{user.lastName} + ' *'">Nom *</span>
+                        <input type="text" th:field="*{lastName}" autocomplete="family-name">
+                        <small class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></small>
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label>
+                        <span th:text="#{user.email} + ' *'">Adresse e-mail *</span>
+                        <input type="email" th:field="*{email}" autocomplete="email">
+                        <small class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{checkout.phone} + ' *'">Téléphone *</span>
+                        <input type="tel" th:field="*{phone}" autocomplete="tel" inputmode="numeric" placeholder="0470123456">
+                        <small class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label>
+                        <span th:text="#{user.password} + ' *'">Mot de passe *</span>
+                        <input type="password" name="password" autocomplete="new-password">
+                        <small class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{inscription.confirmPassword} + ' *'">Confirmer le mot de passe *</span>
+                        <input type="password" name="confirmPassword" autocomplete="new-password">
+                        <small class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></small>
+                    </label>
+                </div>
+                <small class="muted" th:text="#{inscription.passwordHint}">8 caractères minimum, une majuscule et un chiffre.</small>
+
+                <h3 th:text="#{inscription.deliveryAddress}">Adresse de livraison</h3>
+                <label>
+                    <span th:text="#{checkout.street} + ' *'">Adresse *</span>
+                    <input type="text" th:field="*{address}" autocomplete="street-address">
+                    <small class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></small>
+                </label>
+                <label>
+                    <span th:text="#{checkout.complement}">Complément d'adresse</span>
+                    <input type="text" th:field="*{addressComplement}" th:placeholder="#{checkout.complement.hint}">
+                    <small class="field-error" th:if="${#fields.hasErrors('addressComplement')}" th:errors="*{addressComplement}"></small>
+                </label>
+                <div class="form-row">
+                    <label>
+                        <span th:text="#{checkout.postalCode} + ' *'">Code postal *</span>
+                        <input type="text" th:field="*{postalCode}" autocomplete="postal-code" inputmode="numeric">
+                        <small class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"></small>
+                    </label>
+                    <label>
+                        <span th:text="#{checkout.city} + ' *'">Ville *</span>
+                        <input type="text" th:field="*{city}" autocomplete="address-level2">
+                        <small class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></small>
+                    </label>
+                </div>
+                <label>
+                    <span th:text="#{checkout.country} + ' *'">Pays *</span>
+                    <select th:field="*{country}">
+                        <option th:each="c : ${countries}" th:value="${c}" th:text="${c}">Belgique</option>
+                    </select>
+                    <small class="field-error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></small>
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" th:field="*{newsletter}">
+                    <span th:text="#{inscription.newsletter}">Newsletter</span>
+                </label>
+                <label class="check">
+                    <input type="checkbox" th:field="*{acceptTerms}">
+                    <span th:text="#{inscription.terms}">J'accepte les conditions d'utilisation. *</span>
+                </label>
+                <small class="field-error" th:if="${#fields.hasErrors('acceptTerms')}" th:errors="*{acceptTerms}"></small>
+                <button class="btn btn-primary btn-block" type="submit" th:text="#{inscription.submit}">Créer mon compte</button>
+                <small class="muted" th:text="#{inscription.required}">* Champs obligatoires.</small>
+            </form>
+        </div>
+
+    </section>
+
 </main>
 </body>
 </html>

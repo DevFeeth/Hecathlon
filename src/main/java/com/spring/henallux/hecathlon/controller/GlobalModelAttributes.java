@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.List;
 
-/** Data needed by the layout (header menu, footer) on every page. */
 @ControllerAdvice
 public class GlobalModelAttributes {
-
     private final SportService sportService;
 
     @Autowired

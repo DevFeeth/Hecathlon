@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AuthorityMapper {
-
     @Mapping(source = "name", target = "name")
     Authority authorityEntityToAuthorityModel(AuthorityEntity authorityEntity);
 
