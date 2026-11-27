@@ -1,7 +1,7 @@
 server:
   port: 8082
   servlet:
-    context-path: /firstSpring
+    context-path: /hecathlon
   ssl:
     enabled: true
     key-store: classpath:keystore.p12
@@ -11,7 +11,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/childdb
+    url: jdbc:postgresql://localhost:5432/hecathlon
     username: myuser
     password: secret
     driverClassName: org.postgresql.Driver

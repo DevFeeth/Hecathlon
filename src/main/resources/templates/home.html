@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html
+        lang="fr"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<main layout:fragment="main-content">
+
+    <!-- Hero -->
+    <section class="container hero">
+        <div class="hero-main ph-running">
+            <div class="hero-content">
+                <p class="kicker" th:text="#{hero.kicker}">Collection course à pied</p>
+                <h1>
+                    <span th:text="#{hero.title1}">Le bon élan.</span><br>
+                    <span th:text="#{hero.title2}">À chaque foulée.</span>
+                </h1>
+                <p th:text="#{hero.text}">Du premier kilomètre à votre prochain record.</p>
+                <a class="btn btn-primary" href="#" th:text="#{hero.cta}">Découvrir</a>
+            </div>
+        </div>
+
+        <div class="hero-side">
+            <a class="hero-card" href="#" th:each="p : ${highlightedProducts}">
+                <div>
+                    <p class="kicker" th:text="${p.brand}">Marque</p>
+                    <p class="hero-card-title" th:text="${p.name}">Produit</p>
+                    <p th:replace="~{fragments/fragments.html :: price(${p})}"></p>
+                    <span class="link" th:text="#{hero.shop} + ' →'">Je m'équipe →</span>
+                </div>
+                <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Reassurance -->
+    <section class="container reassurance">
+        <div th:each="item : ${ {'pickup', 'delivery', 'returns', 'workshop'} }">
+            <span class="icon" aria-hidden="true" th:text="#{${'reassurance.' + item + '.icon'}}">✓</span>
+            <div>
+                <strong th:text="#{${'reassurance.' + item + '.title'}}">Titre</strong>
+                <small th:text="#{${'reassurance.' + item + '.text'}}">Texte</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sports -->
+    <section class="container section">
+        <div class="section-head">
+            <h2 th:text="#{home.sports.title}">À chaque passion, son terrain.</h2>
+            <a class="link" href="#" th:text="#{nav.allSports} + ' →'">Tous les sports →</a>
+        </div>
+        <div class="grid grid-3">
+            <a class="sport-card" href="#" th:each="sport : ${sports}">
+                <div th:replace="~{fragments/fragments.html :: media(${sport.image}, ${sport.id})}"></div>
+                <div class="sport-card-title">
+                    <h3 th:text="#{${'sport.' + sport.id}}">Sport</h3>
+                    <span aria-hidden="true">→</span>
+                </div>
+                <small th:text="#{${'sport.' + sport.id + '.tagline'}}">Accroche</small>
+            </a>
+        </div>
+    </section>
+
+    <!-- Favourite products -->
+    <section class="container section">
+        <div class="section-head">
+            <h2 th:text="#{home.favorites.title}">Vos favoris. Nos valeurs sûres.</h2>
+            <a class="link" href="#" th:text="#{home.favorites.link} + ' →'">Voir les meilleures ventes →</a>
+        </div>
+        <div class="grid grid-4">
+            <a class="product-card" href="#" th:each="p : ${featuredProducts}">
+                <div class="product-media">
+                    <div th:replace="~{fragments/fragments.html :: media(${p.image}, ${p.sportId})}"></div>
+                    <span class="badge sale" th:if="${p.discountPercent > 0}" th:text="'-' + ${p.discountPercent} + ' %'">-10 %</span>
+                    <span class="badge" th:if="${p.discountPercent == 0 and p.bestSeller}" th:text="#{product.bestSeller}">Meilleure vente</span>
+                </div>
+                <p class="kicker muted" th:text="${p.brand}">Marque</p>
+                <h3 th:text="${p.name}">Produit</h3>
+                <small th:text="${p.description}">Description</small>
+                <small class="rating">★ <span th:text="${#numbers.formatDecimal(p.rating, 1, 1, 'COMMA')}">4,5</span>
+                    (<span th:text="${p.reviewCount}">0</span>)</small>
+                <p th:replace="~{fragments/fragments.html :: price(${p})}"></p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Promotion banner -->
+    <section class="container section">
+        <div class="promo-banner">
+            <div>
+                <p class="kicker" th:text="#{promo.kicker}">Les prix qui donnent envie de bouger</p>
+                <h2 th:text="#{promo.title}">Jusqu'à -40 %*</h2>
+                <small th:text="#{promo.text}">Sur une sélection d'articles.</small>
+            </div>
+            <a class="btn btn-light" href="#" th:text="#{promo.cta}">Profiter des offres</a>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>
